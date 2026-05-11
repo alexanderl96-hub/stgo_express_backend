@@ -1,20 +1,48 @@
-import { users } from "../../data/db.js";
+import pool from "../config/db.js";
 
 import {
-  createNewUser,
-  getUserById,
-  updateUser,
-  deleteUser
+  createNewUser
 } from "../utils/factories.js";
 
 
 
-export const getCustomers = (req, res) => {
-  res.json(users);
+// GET ALL CUSTOMERS
+export const getCustomers = async (
+  req,
+  res
+) => {
+
+  try {
+
+    const result = await pool.query(
+      `
+      SELECT * FROM customers
+      ORDER BY customer_id DESC
+      `
+    );
+
+    return res.status(200).json(
+      result.rows
+    );
+
+  } catch (error) {
+
+    console.log(error);
+
+    return res.status(500).json({
+      success: false,
+      message:
+        "Error fetching customers"
+    });
+  }
 };
 
 
-export const createCustomer = (req, res) => {
+// CREATE CUSTOMER
+export const createCustomer = async (
+  req,
+  res
+) => {
 
   try {
 
@@ -48,15 +76,20 @@ export const createCustomer = (req, res) => {
 
 
     // CHECK IF USER EXISTS
-    const existingUser = users.find(
-      (user) =>
-        user.email.toLowerCase() ===
-        email.toLowerCase()
-    );
+    const existingUser =
+      await pool.query(
+        `
+        SELECT * FROM customers
+        WHERE email = $1
+        `,
+        [email]
+      );
 
 
 
-    if (existingUser) {
+    if (
+      existingUser.rows.length > 0
+    ) {
       return res.status(409).json({
         success: false,
         message:
@@ -66,7 +99,7 @@ export const createCustomer = (req, res) => {
 
 
 
-    // CREATE USER
+    // CREATE USER OBJECT
     const newUser = createNewUser({
       name,
       email,
@@ -80,14 +113,59 @@ export const createCustomer = (req, res) => {
 
 
 
-    // SAVE USER
-    users.push(newUser);
+    // INSERT INTO DATABASE
+    const result = await pool.query(
+      `
+      INSERT INTO customers (
+        name,
+        email,
+        phone,
+        password,
+        birthday,
+        imagen,
+        address,
+        role,
+        user_create,
+        "order",
+        "orderProccess",
+        delivered
+      )
+      VALUES (
+        $1, $2, $3, $4,
+        $5, $6, $7, $8,
+        $9, $10, $11, $12
+      )
+      RETURNING *
+      `,
+      [
+        newUser.name,
+        newUser.email,
+        newUser.phone,
+        newUser.password,
+        newUser.birthday,
+        newUser.imagen,
+        newUser.address,
+        newUser.role,
+
+        newUser.userCreate,
+
+        JSON.stringify(newUser.order),
+
+        JSON.stringify(
+          newUser.orderProccess
+        ),
+
+        JSON.stringify(
+          newUser.delivered
+        )
+      ]
+    );
 
 
 
     return res.status(201).json({
       success: true,
-      user: newUser
+      user: result.rows[0]
     });
 
   } catch (error) {
@@ -102,146 +180,161 @@ export const createCustomer = (req, res) => {
   }
 };
 
-export const getCustomerById = (
-  req,
-  res
-) => {
 
-  try {
+// GET CUSTOMER BY ID
+export const getCustomerById =
+  async (req, res) => {
 
-    const { id } = req.params;
+    try {
 
-
-
-    const user = getUserById(
-      users,
-      Number(id)
-    );
+      const { id } = req.params;
 
 
 
-    if (!user) {
-      return res.status(404).json({
+      const result =
+        await pool.query(
+          `
+          SELECT * FROM customers
+          WHERE customer_id = $1
+          `,
+          [id]
+        );
+
+
+
+      if (
+        result.rows.length === 0
+      ) {
+        return res.status(404).json({
+          success: false,
+          message:
+            "User not found"
+        });
+      }
+
+
+
+      return res.status(200).json(
+        result.rows[0]
+      );
+
+    } catch (error) {
+
+      console.log(error);
+
+      return res.status(500).json({
         success: false,
-        message: "User not found"
+        message:
+          "Error fetching customer"
       });
     }
+  };
+
+
+// UPDATE CUSTOMER
+export const updateCustomer =
+  async (req, res) => {
+
+    try {
+
+      const { id } = req.params;
+
+      const {
+        name,
+        email,
+        phone,
+        password,
+        birthday,
+        imagen,
+        address,
+        role
+      } = req.body;
 
 
 
-    return res.status(200).json(user);
-
-  } catch (error) {
-
-    console.log(error);
-
-    return res.status(500).json({
-      success: false,
-      message:
-        "Error fetching customer"
-    });
-  }
-};
-
-export const updateCustomer = (
-  req,
-  res
-) => {
-
-  try {
-
-    const { id } = req.params;
-
-
-
-    const existingUser = getUserById(
-      users,
-      Number(id)
-    );
-
+      const result =
+        await pool.query(
+          `
+          UPDATE customers
+          SET
+            name = $1,
+            email = $2,
+            phone = $3,
+            password = $4,
+            birthday = $5,
+            imagen = $6,
+            address = $7,
+            role = $8
+          WHERE customer_id = $9
+          RETURNING *
+          `,
+          [
+            name,
+            email,
+            phone,
+            password,
+            birthday,
+            imagen,
+            address,
+            role,
+            id
+          ]
+        );
 
 
-    if (!existingUser) {
-      return res.status(404).json({
+
+      return res.status(200).json({
+        success: true,
+        user: result.rows[0]
+      });
+
+    } catch (error) {
+
+      console.log(error);
+
+      return res.status(500).json({
         success: false,
-        message: "User not found"
+        message:
+          "Error updating customer"
       });
     }
+  };
+
+
+// DELETE CUSTOMER
+export const deleteCustomer =
+  async (req, res) => {
+
+    try {
+
+      const { id } = req.params;
 
 
 
-    const updatedUsers = updateUser(
-      users,
-      Number(id),
-      req.body
-    );
+      await pool.query(
+        `
+        DELETE FROM customers
+        WHERE customer_id = $1
+        `,
+        [id]
+      );
 
 
 
-    return res.status(200).json({
-      success: true,
-      users: updatedUsers
-    });
+      return res.status(200).json({
+        success: true,
+        message:
+          "Customer deleted"
+      });
 
-  } catch (error) {
+    } catch (error) {
 
-    console.log(error);
+      console.log(error);
 
-    return res.status(500).json({
-      success: false,
-      message:
-        "Error updating customer"
-    });
-  }
-};
-
-export const deleteCustomer = (
-  req,
-  res
-) => {
-
-  try {
-
-    const { id } = req.params;
-
-
-
-    const existingUser = getUserById(
-      users,
-      Number(id)
-    );
-
-
-
-    if (!existingUser) {
-      return res.status(404).json({
+      return res.status(500).json({
         success: false,
-        message: "User not found"
+        message:
+          "Error deleting customer"
       });
     }
-
-
-
-    const updatedUsers = deleteUser(
-      users,
-      Number(id)
-    );
-
-
-
-    return res.status(200).json({
-      success: true,
-      users: updatedUsers
-    });
-
-  } catch (error) {
-
-    console.log(error);
-
-    return res.status(500).json({
-      success: false,
-      message:
-        "Error deleting customer"
-    });
-  }
-};
+  };

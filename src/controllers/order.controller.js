@@ -1,77 +1,8 @@
-import { orders, users } from "../../data/db.js";
-import { createNewOrder } from "../utils/factories.js";
+import pool from "../config/db.js";
 
-// export const createOrder = (req, res) => {
-//   const { email, orders, paymentFormat, paymentOption } = req.body;
-
-//   const user = users.find(u => u.email === email);
-
-//   if (!user) {
-//     return res.status(404).json({ message: "User not found" });
-//   }
-
-//   const newOrder = createNewOrder({
-//     orders,
-//     paymentFormat,
-//     paymentOption
-//   });
-
-//   user.order.push(newOrder);
-
-//   res.status(201).json(newOrder);
-// };
-
-export const getOrders = (req, res) => {
-  const allOrders = orders.flatMap(user =>
-     user
-  );
-
-  res.json(allOrders);
-};
-
-// export const getAllOrders = (req, res) => {
-//   const allOrders = orders.flatMap(user =>
-//     (user.order || []).map(order => ({
-//       ...order,
-//       userName: user.name
-//     }))
-//   );
-
-//   res.json(allOrders);
-// };
-
-// export const updateOrder = (req, res) => {
-//   const { id } = req.params;
-//   const { status } = req.body;
-
-//   let updatedOrder = null;
-
-//   users.forEach(customer => {
-//     customer.order = customer.order.map(order => {
-//       if (order.id == id) {
-//         updatedOrder = { ...order, status };
-//         return updatedOrder;
-//       }
-//       return order;
-//     });
-//   });
-
-//   if (!updatedOrder) {
-//     return res.status(404).json({ message: "Order not found" });
-//   }
-
-//   res.json({
-//     message: "Order updated",
-//     order: updatedOrder
-//   });
-// };
-
-
-// import { users } from "../../data/db.js";
-
-// import {
-//   createNewOrder
-// } from "../utils/factories.js";
+import {
+  createNewOrder
+} from "../utils/factories.js";
 
 
 
@@ -79,38 +10,63 @@ export const getOrders = (req, res) => {
    CREATE ORDER
 ========================================= */
 
-export const createOrder = (req, res) => {
+export const createOrder = async (
+  req,
+  res
+) => {
 
   try {
 
     const {
+
       email,
+
       orders,
+
       paymentFormat,
+
       paymentOption,
+
       admInCharge,
+
       gestorSell,
+
       sellerCash,
+
       dollarPrice,
+
       cupPrice,
+
       revenewTotal,
+
       tienda,
+
       qrcode,
-      statusSell
+
+      statusSell,
+
+      phone
+
     } = req.body;
 
 
 
     // FIND USER
-    const user = users.find(
-      (u) =>
-        u.email.toLowerCase() ===
-        email.toLowerCase()
-    );
+    const userResult =
+      await pool.query(
+        `
+        SELECT *
+        FROM customers
+        WHERE email = $1
+        `,
+        [email]
+      );
 
 
 
-    if (!user) {
+    if (
+      userResult.rows.length === 0
+    ) {
       return res.status(404).json({
         success: false,
         message: "User not found"
@@ -119,44 +75,138 @@ export const createOrder = (req, res) => {
 
 
 
-    // CREATE ORDER
-    const newOrder = createNewOrder({
-
-      orders,
-
-      paymentFormat,
-
-      paymentOption,
-
-      admInCharge,
-
-      gestorSell,
-
-      sellerCash,
-
-      dollarPrice,
-
-      cupPrice,
-
-      revenewTotal,
-
-      tienda,
-
-      qrcode,
-
-      statusSell
-    });
+    const user =
+      userResult.rows[0];
 
 
 
-    // PUSH ORDER
-    user.order.push(newOrder);
+    // CREATE ORDER OBJECT
+    const newOrder =
+      createNewOrder({
+
+        orders,
+
+        paymentFormat,
+
+        paymentOption,
+
+        admInCharge,
+
+        gestorSell,
+
+        sellerCash,
+
+        dollarPrice,
+
+        cupPrice,
+
+        revenewTotal,
+
+        tienda,
+
+        qrcode,
+
+        statusSell,
+
+        phone
+      });
+
+
+
+    // INSERT ORDER
+    const result =
+      await pool.query(
+        `
+        INSERT INTO orders (
+
+          id,
+
+          customer_id,
+
+          qrcode,
+
+          adm_in_charge,
+
+          gestor_sell,
+
+          orders,
+
+          dollar_price,
+
+          cup_price,
+
+          revenew_total,
+
+          seller_cash,
+
+          tienda,
+
+          phone,
+
+          date,
+
+          payment_format,
+
+          payment_option,
+
+          status_sell
+
+        )
+        VALUES (
+
+          $1, $2, $3, $4,
+          $5, $6, $7, $8,
+          $9, $10, $11, $12,
+          $13, $14, $15, $16
+
+        )
+        RETURNING *
+        `,
+        [
+
+          newOrder.id,
+
+          user.customer_id,
+
+          newOrder.qrcode,
+
+          newOrder.admInCharge,
+
+          newOrder.gestorSell,
+
+          JSON.stringify(
+            newOrder.orders
+          ),
+
+          newOrder.dollarPrice,
+
+          newOrder.cupPrice,
+
+          newOrder.revenewTotal,
+
+          newOrder.sellerCash,
+
+          newOrder.tienda,
+
+          newOrder.phone,
+
+          newOrder.date,
+
+          newOrder.paymentFormat,
+
+          newOrder.paymentOption,
+
+          newOrder.statusSell
+        ]
+      );
 
 
 
     return res.status(201).json({
+
       success: true,
-      order: newOrder
+
+      order: result.rows[0]
     });
 
   } catch (error) {
@@ -164,9 +214,10 @@ export const createOrder = (req, res) => {
     console.log(error);
 
     return res.status(500).json({
+
       success: false,
-      message:
-        "Error creating order"
+
+      error: error.message
     });
   }
 };
@@ -177,50 +228,52 @@ export const createOrder = (req, res) => {
    GET ALL ORDERS
 ========================================= */
 
-export const getAllOrders = (
-  req,
-  res
-) => {
+export const getAllOrders =
+  async (req, res) => {
 
-  try {
+    try {
 
-    const allOrders = users.flatMap(
-      (user) =>
+      const result =
+        await pool.query(
+          `
+          SELECT
+            orders.*,
 
-        (user.order || []).map(
-          (order) => ({
+            customers.name
+              AS customer_name,
 
-            ...order,
+            customers.email
+              AS customer_email
 
-            customerId:
-              user.customerId,
+          FROM orders
 
-            customerName:
-              user.name,
+          JOIN customers
+          ON orders.customer_id =
+             customers.customer_id
 
-            customerEmail:
-              user.email
-          })
-        )
-    );
-
+          ORDER BY orders.date DESC
+          `
+        );
 
 
-    return res.status(200).json(
-      allOrders
-    );
 
-  } catch (error) {
+      return res.status(200).json(
+        result.rows
+      );
 
-    console.log(error);
+    } catch (error) {
 
-    return res.status(500).json({
-      success: false,
-      message:
-        "Error fetching orders"
-    });
-  }
-};
+      console.log(error);
+
+      return res.status(500).json({
+
+        success: false,
+
+        message:
+          "Error fetching orders"
+      });
+    }
+  };
 
 
 
@@ -228,73 +281,60 @@ export const getAllOrders = (
    GET ONE ORDER
 ========================================= */
 
-export const getOrderById = (
-  req,
-  res
-) => {
+export const getOrderById =
+  async (req, res) => {
 
-  try {
+    try {
 
-    const { id } = req.params;
-
-    let foundOrder = null;
+      const { id } = req.params;
 
 
 
-    users.forEach((user) => {
+      const result =
+        await pool.query(
+          `
+          SELECT *
 
-      const order = user.order.find(
-        (o) =>
-          Number(o.id) === Number(id)
+          FROM orders
+
+          WHERE id = $1
+          `,
+          [id]
+        );
+
+
+
+      if (
+        result.rows.length === 0
+      ) {
+        return res.status(404).json({
+
+          success: false,
+
+          message:
+            "Order not found"
+        });
+      }
+
+
+
+      return res.status(200).json(
+        result.rows[0]
       );
 
+    } catch (error) {
 
+      console.log(error);
 
-      if (order) {
+      return res.status(500).json({
 
-        foundOrder = {
-
-          ...order,
-
-          customerId:
-            user.customerId,
-
-          customerName:
-            user.name,
-
-          customerEmail:
-            user.email
-        };
-      }
-    });
-
-
-
-    if (!foundOrder) {
-      return res.status(404).json({
         success: false,
+
         message:
-          "Order not found"
+          "Error fetching order"
       });
     }
-
-
-
-    return res.status(200).json(
-      foundOrder
-    );
-
-  } catch (error) {
-
-    console.log(error);
-
-    return res.status(500).json({
-      success: false,
-      message:
-        "Error fetching order"
-    });
-  }
-};
+  };
 
 
 
@@ -302,80 +342,75 @@ export const getOrderById = (
    UPDATE ORDER
 ========================================= */
 
-export const updateOrder = (
-  req,
-  res
-) => {
+export const updateOrder =
+  async (req, res) => {
 
-  try {
+    try {
 
-    const { id } = req.params;
+      const { id } = req.params;
 
-    const updatedData = req.body;
-
-    let updatedOrder = null;
+      const updatedData =
+        req.body;
 
 
 
-    users.forEach((user) => {
+      const result =
+        await pool.query(
+          `
+          UPDATE orders
 
-      user.order = user.order.map(
-        (order) => {
+          SET
 
-          if (
-            Number(order.id) ===
-            Number(id)
-          ) {
+            payment_format =
+              $1,
 
-            updatedOrder = {
+            payment_option =
+              $2,
 
-              ...order,
+            status_sell =
+              $3
 
-              ...updatedData
-            };
+          WHERE id = $4
 
-            return updatedOrder;
-          }
+          RETURNING *
+          `,
+          [
 
-          return order;
-        }
-      );
-    });
+            updatedData.paymentFormat,
+
+            updatedData.paymentOption,
+
+            updatedData.statusSell,
+
+            id
+          ]
+        );
 
 
 
-    if (!updatedOrder) {
+      return res.status(200).json({
 
-      return res.status(404).json({
-        success: false,
+        success: true,
+
         message:
-          "Order not found"
+          "Order updated successfully",
+
+        order: result.rows[0]
+      });
+
+    } catch (error) {
+
+      console.log(error);
+
+      return res.status(500).json({
+
+        success: false,
+
+        message:
+          "Error updating order"
       });
     }
-
-
-
-    return res.status(200).json({
-
-      success: true,
-
-      message:
-        "Order updated successfully",
-
-      order: updatedOrder
-    });
-
-  } catch (error) {
-
-    console.log(error);
-
-    return res.status(500).json({
-      success: false,
-      message:
-        "Error updating order"
-    });
-  }
-};
+  };
 
 
 
@@ -383,71 +418,43 @@ export const updateOrder = (
    DELETE ORDER
 ========================================= */
 
-export const deleteOrder = (
-  req,
-  res
-) => {
+export const deleteOrder =
+  async (req, res) => {
 
-  try {
+    try {
 
-    const { id } = req.params;
-
-    let orderDeleted = false;
+      const { id } = req.params;
 
 
 
-    users.forEach((user) => {
-
-      const originalLength =
-        user.order.length;
-
-
-
-      user.order = user.order.filter(
-        (order) =>
-          Number(order.id) !==
-          Number(id)
+      await pool.query(
+        `
+        DELETE FROM orders
+        WHERE id = $1
+        `,
+        [id]
       );
 
 
 
-      if (
-        originalLength !==
-        user.order.length
-      ) {
-        orderDeleted = true;
-      }
-    });
+      return res.status(200).json({
 
+        success: true,
 
-
-    if (!orderDeleted) {
-
-      return res.status(404).json({
-        success: false,
         message:
-          "Order not found"
+          "Order deleted successfully"
+      });
+
+    } catch (error) {
+
+      console.log(error);
+
+      return res.status(500).json({
+
+        success: false,
+
+        message:
+          "Error deleting order"
       });
     }
-
-
-
-    return res.status(200).json({
-
-      success: true,
-
-      message:
-        "Order deleted successfully"
-    });
-
-  } catch (error) {
-
-    console.log(error);
-
-    return res.status(500).json({
-      success: false,
-      message:
-        "Error deleting order"
-    });
-  }
-};
+  };

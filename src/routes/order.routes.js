@@ -1,13 +1,13 @@
 import express from "express";
-import { createOrder, getOrders, getAllOrders, updateOrder,
+import { createOrder, getAllOrders, updateOrder,
     getOrderById, deleteOrder
  } from "../controllers/order.controller.js";
 import { protect } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-router.get("/admin", getOrders);
-router.get("/ordersQR", getOrders)
+// router.get("/admin", getOrders);
+// router.get("/ordersQR", getOrders)
 
 router.post("/create", createOrder);
 
