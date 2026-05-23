@@ -8,6 +8,8 @@ import adminRoutes from "./routes/admin.routes.js"
 import productsRoutes from "./routes/products.routes.js"
 import categoryRoutes from "./routes/category.routes.js";
 import colorRoutes from "./routes/color.routes.js";
+import passwordRoutes from "./routes/password.routes.js";
+import productImagesRoutes from "./routes/productImages.routes.js";
 
 import path from "path";
 import { fileURLToPath } from "url";
@@ -40,5 +42,8 @@ app.use("/api/customers", customerRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/colors", colorRoutes);
+
+app.use("/api/auth", passwordRoutes);
+app.use("/api/product-images", productImagesRoutes);
 
 export default app;
