@@ -1,16 +1,31 @@
 import express from "express";
-import { getAdmins } from "../controllers/admin.controllers.js";
-import { adminLogin } from "../controllers/admin.auth.controller.js";
-import { getAdminDashboard } from "../controllers/admin.dashboard.controllers.js";
+import {
+  createAdmin,
+  getAdmins,
+  getAdmin,
+  updateAdmin,
+  deleteAdmin,
+} from "../controllers/admin/admin.controllers.js";
+import { adminLogin } from "../controllers/admin/admin.auth.controller.js";
+import { getAdminDashboard } from "../middleware/auth.middleware.js";
+
 const router = express.Router();
 
-// router.get("/", getAdmins);
+// Verify credentials
+router.post("/register", createAdmin);
 router.post("/login", adminLogin);
-router.get("/dashboard", getAdminDashboard); 
+router.get("/dashboard", getAdminDashboard);
+//===============
 
-// router.post("/", createCustomer);
-// router.get("/dashboard", protectAdmin, (req, res) => {
-//   res.json({ message: "Admin only data" });
-// });
+// GetRoutes
+
+// CREATE
+router.get("/", getAdmins);
+
+router.get("/:id", getAdmin);
+
+router.put("/:id", updateAdmin);
+
+router.delete("/:id", deleteAdmin);
 
 export default router;

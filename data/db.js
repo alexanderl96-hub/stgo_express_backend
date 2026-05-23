@@ -795,11 +795,11 @@ export const products = [
         length: "",
         store: "Temu",
         likes: 0,
-        dollarPrice: 15,
-        currentDollarPrice: 510,
+        dollar_price: 15,
+        current_dollar_price: 510,
         price: 18000, 
-        originalPrice: 18000, 
-        total_Items: 3,
+        original_price: 18000, 
+        total_items: 3,
         description: `Zapatillas de baloncesto de caña alta para hombre — Robustas  
         y estables, zapatillas de entrenamiento unisex con cordones, textura en el 
         arco y suela especializada — Ideales para correr, fitness, baloncesto y 

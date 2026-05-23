@@ -73,8 +73,9 @@ export const createProduct =
             $1, $2, $3, $4, $5,
             $6, $7, $8, $9, $10,
             $11, $12, $13, $14, $15,
-            $16, $17, $18, $19, $20,
-            $21
+            $16, $17, $18, $19, 
+            $20, $21
+           
 
           )
           RETURNING *
@@ -89,7 +90,7 @@ export const createProduct =
 
             newProduct.price,
 
-            newProduct.originalPrice,
+            newProduct.original_price,
 
             newProduct.discount,
 
@@ -101,13 +102,13 @@ export const createProduct =
 
             newProduct.category,
 
-            newProduct.subCategory,
+            newProduct.sub_category,
 
             newProduct.brand,
 
             newProduct.gender,
 
-            newProduct.ageGroup,
+            newProduct.age_group,
 
             JSON.stringify(
               newProduct.colors
@@ -123,7 +124,7 @@ export const createProduct =
               newProduct.img
             ),
 
-            newProduct.totalItems,
+            newProduct.total_items,
 
             newProduct.sold,
 
@@ -266,7 +267,6 @@ export const updateProduct =
       const data = req.body;
 
 
-
       const result =
         await pool.query(
           `
@@ -280,9 +280,17 @@ export const updateProduct =
 
             price = $3,
 
-            stock = $4
+            stock = $4,
 
-          WHERE id = $5
+            discount = $5,
+
+            rating = $6,
+
+            reviews = $7,
+
+            sold = $8
+
+          WHERE id = $9
 
           RETURNING *
           `,
@@ -295,6 +303,14 @@ export const updateProduct =
             data.price,
 
             data.stock,
+
+            data.discount,
+
+            data.rating,
+
+            data.reviews,
+
+            data.sold,
 
             id
           ]

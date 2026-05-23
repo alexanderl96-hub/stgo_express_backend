@@ -12,7 +12,6 @@ export const createNewUser = ({
   role = "users"
 }) => {
   return {
-    customerId: Date.now(),
     name,
     email,
     phone,
@@ -20,7 +19,7 @@ export const createNewUser = ({
     birthday,
     imagen,
     address,
-    userCreate: new Date().toLocaleString(),
+    user_create: new Date().toLocaleString(),
     role,
     order: [],
     orderProccess: [],
@@ -69,21 +68,88 @@ export const deleteUser = (users, customerId) => {
 
 
 
+// CRUD for admin
+
+export const createNewAdmin = ({
+  name,
+  email,
+  phone,
+  password = "",
+  birthday = "",
+  imagen = "",
+  address = "",
+  role = "admin",
+  user_create = new Date().toLocaleString(),
+  job = ""
+}) => {
+  return {
+    name,
+    email,
+    phone,
+    password,
+    birthday,
+    imagen,
+    address,
+    user_create,
+    role,
+    job
+  };
+};
+
+export const getAdminById = (admins, adminId) => {
+  return admins.find(admin => admin.adminId === adminId);
+};
+
+export const updateAdmin = (admins, adminId, updatedData) => {
+  const admin = admins.find(admin => admin.adminId === adminId);
+
+  if (!admin) {
+    return null;
+  }
+
+  Object.assign(admin, {
+    name: updatedData.name ?? admin.name,
+    email: updatedData.email ?? admin.email,
+    phone: updatedData.phone ?? admin.phone,
+    password: updatedData.password ?? admin.password,
+    birthday: updatedData.birthday ?? admin.birthday,
+    imagen: updatedData.imagen ?? admin.imagen,
+    address: updatedData.address ?? admin.address,
+    role: updatedData.role ?? admin.role
+  });
+
+  return admin;
+};
+
+export const deleteAdmin = (admins, adminId) => {
+  const index = admins.findIndex(admin => admin.adminId === adminId);
+
+  if (index === -1) {
+    return null;
+  }
+
+  return admins.splice(index, 1)[0];
+};
 
 
+
+
+
+// CREUD for orders
 export const createNewOrder = ({
   orders = [],
-  paymentFormat = "",
-  paymentOption = "",
-  admInCharge = "",
-  gestorSell = "",
-  sellerCash = 0,
-  dollarPrice = 0,
-  cupPrice = 0,
-  revenewTotal = 0,
+  payment_format = "",
+  payment_option = "",
+  adm_in_charge = "",
+  gestor_sell = "",
+  seller_cash = 0,
+  dollar_price = 0,
+  cup_price = 0,
+  revenew_total = 0,
   tienda = 0,
   qrcode = "",
-  statusSell = "Pendiente"
+  status_sell = "Pendiente",
+  phone = ""
 }) => {
 
   return {
@@ -94,27 +160,29 @@ export const createNewOrder = ({
 
     tienda,
 
-    admInCharge,
+    adm_in_charge,
 
-    gestorSell,
+    gestor_sell,
 
     orders,
 
-    dollarPrice,
+    dollar_price,
 
-    cupPrice,
+    cup_price,
 
-    revenewTotal,
+    revenew_total,
 
-    sellerCash,
+    seller_cash,
 
     date: new Date().toLocaleString(),
 
-    paymentFormat,
+    payment_format,
 
-    paymentOption,
+    payment_option,
 
-    statusSell
+    status_sell,
+
+    phone
   };
 };
 
@@ -155,45 +223,45 @@ export const updateOrder = (
         updatedData.tienda ??
         order.tienda,
 
-      admInCharge:
-        updatedData.admInCharge ??
-        order.admInCharge,
+      adm_in_charge:
+        updatedData.adm_in_charge ??
+        order.adm_in_charge,
 
-      gestorSell:
-        updatedData.gestorSell ??
-        order.gestorSell,
+      gestor_sell:
+        updatedData.gestor_sell ??
+        order.gestor_sell,
 
       orders:
         updatedData.orders ??
         order.orders,
 
-      dollarPrice:
-        updatedData.dollarPrice ??
-        order.dollarPrice,
+      dollar_price:
+        updatedData.dollar_price ??
+        order.dollar_price,
 
-      cupPrice:
-        updatedData.cupPrice ??
-        order.cupPrice,
+      cup_price:
+        updatedData.cup_price ??
+        order.cup_price,
 
-      revenewTotal:
-        updatedData.revenewTotal ??
-        order.revenewTotal,
+      revenew_total:
+        updatedData.revenew_total ??
+        order.revenew_total,
 
-      sellerCash:
-        updatedData.sellerCash ??
-        order.sellerCash,
+      seller_cash:
+        updatedData.seller_cash ??
+        order.seller_cash,
 
-      paymentFormat:
-        updatedData.paymentFormat ??
-        order.paymentFormat,
+      payment_format:
+        updatedData.payment_format ??
+        order.payment_format,
 
-      paymentOption:
-        updatedData.paymentOption ??
-        order.paymentOption,
+      payment_option:
+        updatedData.payment_option ??
+        order.payment_option,
 
-      statusSell:
-        updatedData.statusSell ??
-        order.statusSell
+      status_sell:
+        updatedData.status_sell ??
+        order.status_sell
     };
   });
 };
@@ -264,30 +332,39 @@ export const findOrderEverywhere = (
 
 
 
+
+
+// CRUD for products
+
 export const createNewProduct = ({
   type = "",
   name = "",
   category = "",
-  color = [],
+  sub_category = "",
+  colors = [],
   brand = "",
-  size = [],
+  sizes = [],
   length = "",
   store = "",
   likes = 0,
-  dollarPrice = 0,
-  currentDollarPrice = 0,
+  dollar_price = 0,
+  current_dollar_price = 0,
   price = 0,
-  originalPrice = 0,
-  total_Items = 0,
+  original_price = 0,
+  total_items = 0,
+  stock = 0,
+  discount = 0,
   description = "",
-  genero = [],
-  age = 0,
+  gender = [],
+  age_group = 0,
   rating = 0,
   reviews = 0,
+  sold = 0,
   img = [],
   status = "normal",
   date = new Date().toLocaleString(),
-  qrCode = ""
+  qrCode = "",
+  material = ""
 }) => {
 
   return {
@@ -300,11 +377,13 @@ export const createNewProduct = ({
 
     category,
 
-    color,
+    sub_category,
+
+    colors,
 
     brand,
 
-    size,
+    sizes,
 
     length,
 
@@ -312,21 +391,29 @@ export const createNewProduct = ({
 
     likes,
 
-    dollarPrice,
+    dollar_price,
 
-    currentDollarPrice,
+    current_dollar_price,
 
     price,
 
-    originalPrice,
+    original_price,
 
-    total_Items,
+    discount,
+
+    material,
+
+    total_items,
+
+    stock,
+
+    sold,
 
     description,
 
-    genero,
+    gender,
 
-    age,
+    age_group,
 
     rating,
 
@@ -384,18 +471,22 @@ export const updateProduct = (
       category:
         updatedData.category ??
         product.category,
+    
+      sub_category:
+        updatedData.sub_category ??
+        product.sub_category,
 
-      color:
-        updatedData.color ??
-        product.color,
+      colors:
+        updatedData.colors ??
+        product.colors,
 
       brand:
         updatedData.brand ??
         product.brand,
 
-      size:
-        updatedData.size ??
-        product.size,
+      sizes:
+        updatedData.sizes ??
+        product.sizes,
 
       length:
         updatedData.length ??
@@ -409,37 +500,45 @@ export const updateProduct = (
         updatedData.likes ??
         product.likes,
 
-      dollarPrice:
-        updatedData.dollarPrice ??
-        product.dollarPrice,
+      dollar_price:
+        updatedData.dollar_price ??
+        product.dollar_price,
 
-      currentDollarPrice:
-        updatedData.currentDollarPrice ??
-        product.currentDollarPrice,
+      current_dollar_price:
+        updatedData.current_dollar_price ??
+        product.current_dollar_price,
 
       price:
         updatedData.price ??
         product.price,
 
-      originalPrice:
-        updatedData.originalPrice ??
-        product.originalPrice,
+      original_price:
+        updatedData.original_price ??
+        product.original_price,
 
-      total_Items:
-        updatedData.total_Items ??
-        product.total_Items,
+      total_items:
+        updatedData.total_items ??
+        product.total_items,
+    
+      discount:
+        updatedData.discount ??
+        product.discount,
+
+      stock:
+        updatedData.stock ??
+        product.stock,
 
       description:
         updatedData.description ??
         product.description,
 
-      genero:
-        updatedData.genero ??
-        product.genero,
+      gender:
+        updatedData.gender ??
+        product.gender,
 
-      age:
-        updatedData.age ??
-        product.age,
+      age_group:
+        updatedData.age_group ??
+        product.age_group,
 
       rating:
         updatedData.rating ??
@@ -457,9 +556,9 @@ export const updateProduct = (
         updatedData.status ??
         product.status,
 
-      qrCode:
-        updatedData.qrCode ??
-        product.qrCode
+      qrcode:
+        updatedData.qrcode ??
+        product.qrcode
     };
   });
 };

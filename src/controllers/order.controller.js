@@ -23,32 +23,31 @@ export const createOrder = async (
 
       orders,
 
-      paymentFormat,
+      payment_format = orders[0].payment_format,
 
-      paymentOption,
+      payment_option = orders[0].payment_option,
 
-      admInCharge,
+      adm_in_charge = orders[0].adm_in_charge,
 
-      gestorSell,
+      gestor_sell = orders[0].gestor_sell,
 
-      sellerCash,
+      seller_cash = orders[0].seller_cash,
 
-      dollarPrice,
+      dollar_price = orders[0].dollar_price,
 
-      cupPrice,
+      cup_price = orders[0].cup_price,
 
-      revenewTotal,
+      revenew_total = orders[0].revenew_total,
 
-      tienda,
+      tienda = orders[0].tienda,
 
       qrcode,
 
-      statusSell,
+      status_sell = orders[0].status_sell,
 
       phone
 
     } = req.body;
-
 
 
     // FIND USER
@@ -78,37 +77,35 @@ export const createOrder = async (
     const user =
       userResult.rows[0];
 
-
-
     // CREATE ORDER OBJECT
     const newOrder =
       createNewOrder({
 
         orders,
 
-        paymentFormat,
+        payment_format,
 
-        paymentOption,
+        payment_option,
 
-        admInCharge,
+        adm_in_charge,
 
-        gestorSell,
+        gestor_sell,
 
-        sellerCash,
+        seller_cash,
 
-        dollarPrice,
+        dollar_price,
 
-        cupPrice,
+        cup_price,
 
-        revenewTotal,
+        revenew_total,
 
         tienda,
 
         qrcode,
 
-        statusSell,
+        status_sell,
 
-        phone
+        phone 
       });
 
 
@@ -170,21 +167,21 @@ export const createOrder = async (
 
           newOrder.qrcode,
 
-          newOrder.admInCharge,
+          newOrder.adm_in_charge,
 
-          newOrder.gestorSell,
+          newOrder.gestor_sell,
 
           JSON.stringify(
             newOrder.orders
           ),
 
-          newOrder.dollarPrice,
+          newOrder.dollar_price,
 
-          newOrder.cupPrice,
+          newOrder.cup_price,
 
-          newOrder.revenewTotal,
+          newOrder.revenew_total,
 
-          newOrder.sellerCash,
+          newOrder.seller_cash,
 
           newOrder.tienda,
 
@@ -192,11 +189,11 @@ export const createOrder = async (
 
           newOrder.date,
 
-          newOrder.paymentFormat,
+          newOrder.payment_format,
 
-          newOrder.paymentOption,
+          newOrder.payment_option,
 
-          newOrder.statusSell
+          newOrder.status_sell
         ]
       );
 
@@ -221,8 +218,6 @@ export const createOrder = async (
     });
   }
 };
-
-
 
 /* =========================================
    GET ALL ORDERS
@@ -274,8 +269,6 @@ export const getAllOrders =
       });
     }
   };
-
-
 
 /* =========================================
    GET ONE ORDER
@@ -337,7 +330,6 @@ export const getOrderById =
   };
 
 
-
 /* =========================================
    UPDATE ORDER
 ========================================= */
@@ -352,7 +344,7 @@ export const updateOrder =
       const updatedData =
         req.body;
 
-
+      console.log("updatedData", updatedData)
 
       const result =
         await pool.query(
@@ -368,19 +360,31 @@ export const updateOrder =
               $2,
 
             status_sell =
-              $3
+              $3,
+            
+            adm_in_charge  =
+              $4,
+            
+            gestor_sell  =
+              $5
 
-          WHERE id = $4
+
+          WHERE id = $6
 
           RETURNING *
           `,
           [
 
-            updatedData.paymentFormat,
 
-            updatedData.paymentOption,
+            updatedData.orders[0].payment_format,
 
-            updatedData.statusSell,
+            updatedData.orders[0].payment_option,
+
+            updatedData.orders[0].status_sell,
+
+            updatedData.orders[0].adm_in_charge,
+
+            updatedData.orders[0].gestor_sell,
 
             id
           ]
@@ -412,8 +416,7 @@ export const updateOrder =
     }
   };
 
-
-
+  
 /* =========================================
    DELETE ORDER
 ========================================= */
