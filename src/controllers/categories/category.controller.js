@@ -12,7 +12,7 @@ export const createCategory = async (req, res) => {
       category_key,
       name,
       person_in_charge,
-      sub_categories,
+      sub_category,
       filters
     } = req.body;
 
@@ -43,7 +43,7 @@ export const createCategory = async (req, res) => {
         category_key,
         name,
         person_in_charge,
-        sub_categories,
+        sub_category,
         filters
       )
       VALUES
@@ -55,7 +55,7 @@ export const createCategory = async (req, res) => {
         name,
         person_in_charge,
 
-        JSON.stringify(sub_categories || []),
+        JSON.stringify(sub_category || []),
 
         JSON.stringify(filters || [])
       ]
@@ -162,7 +162,7 @@ export const updateCategory = async (req, res) => {
       category_key,
       name,
       person_in_charge,
-      sub_categories,
+      sub_category,
       filters
     } = req.body;
 
@@ -174,7 +174,7 @@ export const updateCategory = async (req, res) => {
         category_key = $1,
         name = $2,
         person_in_charge = $3,
-        sub_categories = $4,
+        sub_category = $4,
         filters = $5
       WHERE category_id = $6
       RETURNING *
@@ -184,7 +184,7 @@ export const updateCategory = async (req, res) => {
         name,
         person_in_charge,
 
-        JSON.stringify(sub_categories || []),
+        JSON.stringify(sub_category || []),
 
         JSON.stringify(filters || []),
 
