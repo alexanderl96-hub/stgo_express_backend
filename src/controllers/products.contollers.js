@@ -172,31 +172,32 @@ export const createProduct =
       // 1. Uploaded files
       // 2. Manual img array
 
-      const uploadedImages =
-
-        req.files &&
-        req.files.length > 0
-
-          ? req.files.map(
-
-              (file) =>
-
-                `/images/products/${file.filename}`
-            )
-
-          : req.body.img || [];
-
-    // const uploadedImages =
+    //   const uploadedImages =
 
     //     req.files &&
-    //         Array.isArray(req.files)
+    //     req.files.length > 0
 
-    //             ? req.files.map(
-    //                 (file) =>
-    //                 `/images/products/${file.filename}`
-    //             )
+    //       ? req.files.map(
 
-    //             : [];
+    //           (file) =>
+
+    //             `/images/products/${file.filename}`
+    //         )
+
+    //       : req.body.img || [];
+
+    const uploadedImages =
+
+            req.files &&
+            Array.isArray(req.files) &&
+            req.files.length > 0
+
+                ? req.files.map(
+                    (file) =>
+                    `/images/products/${file.filename}`
+                )
+
+                : req.body.img || [];
 
 
 
