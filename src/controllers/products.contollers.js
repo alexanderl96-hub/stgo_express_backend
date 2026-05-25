@@ -159,30 +159,44 @@ export const createProduct =
 
     try {
 
-      console.log(req.body);
+      console.log("BODY:", req.body);
 
-      console.log(req.files);
+        console.log("FILES:", req.files);
 
+        console.log("COLORS:", req.body.colors);
 
+        console.log("SIZES:", req.body.sizes);
 
 
       // SUPPORT BOTH:
       // 1. Uploaded files
       // 2. Manual img array
 
-      const uploadedImages =
+    //   const uploadedImages =
+
+    //     req.files &&
+    //     req.files.length > 0
+
+    //       ? req.files.map(
+
+    //           (file) =>
+
+    //             `/images/products/${file.filename}`
+    //         )
+
+    //       : req.body.img || [];
+
+    const uploadedImages =
 
         req.files &&
-        req.files.length > 0
+            Array.isArray(req.files)
 
-          ? req.files.map(
+                ? req.files.map(
+                    (file) =>
+                    `/images/products/${file.filename}`
+                )
 
-              (file) =>
-
-                `/images/products/${file.filename}`
-            )
-
-          : req.body.img || [];
+                : [];
 
 
 
@@ -234,7 +248,7 @@ export const createProduct =
 
           `
           INSERT INTO products (
-            id, 
+
            
             name,
 
@@ -283,14 +297,14 @@ export const createProduct =
             $6, $7, $8, $9, $10,
             $11, $12, $13, $14, $15,
             $16, $17, $18, $19,
-            $20, $21
+            $20
 
           )
           RETURNING *
           `,
 
           [
-            newProduct.id,
+            // newProduct.id,
 
             newProduct.name,
 
