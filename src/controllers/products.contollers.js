@@ -248,7 +248,7 @@ export const createProduct =
 
           `
           INSERT INTO products (
-
+            id, 
            
             name,
 
@@ -297,14 +297,14 @@ export const createProduct =
             $6, $7, $8, $9, $10,
             $11, $12, $13, $14, $15,
             $16, $17, $18, $19,
-            $20
+            $20, $21
 
           )
           RETURNING *
           `,
 
           [
-            // newProduct.id,
+            newProduct.id,
 
             newProduct.name,
 
