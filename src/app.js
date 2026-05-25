@@ -74,13 +74,19 @@ const app = express();
 
 
 // STATIC IMAGES
+// app.use(
+//   "/images",
+//   express.static(
+//     path.join(__dirname, "source")
+//   )
+// );
+
 app.use(
   "/images",
   express.static(
-    path.join(__dirname, "source")
+    path.join(__dirname, "source/images")
   )
 );
-
 
 
 

@@ -1,25 +1,66 @@
 // server.js
+
 import app from "./src/app.js";
-// import pool from "./src/config/db.js";
 
-const PORT = 5001;
+import pool from "./src/config/db.js";
 
-// app.get("/db-test", async (req, res) => {
-//   try {
-//     const data = await pool.query("SELECT NOW()");
-//     res.json({
-//       message: "PostgreSQL Connected",
-//       time: data.rows,
-//     });
-//   } catch (error) {
-//     console.log(error);
 
-//     res.status(500).json({
-//       error: error.message,
-//     });
-//   }
-// });
+
+const PORT =
+  process.env.PORT || 5001;
+
+
+
+
+console.log(
+  "DATABASE URL:",
+  process.env.DATABASE_URL
+);
+
+
+
+
+pool.query("SELECT NOW()")
+  .then((res) => {
+
+    console.log(
+      "DATABASE CONNECTED:",
+      res.rows
+    );
+  })
+  .catch((err) => {
+
+    console.log(
+      "DATABASE ERROR:",
+      err
+    );
+  });
+
+
+
+
+pool.query("SELECT current_database()")
+  .then((res) => {
+
+    console.log(
+      "CONNECTED DB:",
+      res.rows
+    );
+  })
+  .catch((err) => {
+
+    console.log(
+      "DB ERROR:",
+      err
+    );
+  });
+
+
+
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+
+  console.log(
+    `🚀 Server running on http://localhost:${PORT}`
+  );
 });
