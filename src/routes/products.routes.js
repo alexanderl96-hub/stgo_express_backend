@@ -8,6 +8,7 @@ import {   createProduct,
   deleteProduct
  } from "../controllers/products.contollers.js";
 import { protect } from "../middleware/auth.middleware.js";
+import upload from "../config/multer.js";
 
 const router = express.Router();
 
