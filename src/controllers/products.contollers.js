@@ -159,12 +159,56 @@ export const createProduct =
 
     try {
 
-      // CREATE IMAGE PATHS
+      console.log(req.body);
+
+      console.log(req.files);
+
+
+
+
+      // SUPPORT BOTH:
+      // 1. Uploaded files
+      // 2. Manual img array
+
       const uploadedImages =
-        req.files.map(
-          (file) =>
-            `/images/products/${file.filename}`
-        );
+
+        req.files &&
+        req.files.length > 0
+
+          ? req.files.map(
+
+              (file) =>
+
+                `/images/products/${file.filename}`
+            )
+
+          : req.body.img || [];
+
+
+
+
+      // PARSE JSON STRINGS
+      // FROM FORMDATA
+
+      const parsedColors =
+
+        typeof req.body.colors === "string"
+
+          ? JSON.parse(req.body.colors)
+
+          : req.body.colors;
+
+
+
+
+      const parsedSizes =
+
+        typeof req.body.sizes === "string"
+
+          ? JSON.parse(req.body.sizes)
+
+          : req.body.sizes;
+
 
 
 
@@ -174,18 +218,22 @@ export const createProduct =
 
           ...req.body,
 
+          colors: parsedColors,
+
+          sizes: parsedSizes,
+
           img: uploadedImages
         });
+
 
 
 
       // INSERT PRODUCT
       const result =
         await pool.query(
+
           `
           INSERT INTO products (
-
-            id,
 
             name,
 
@@ -234,14 +282,13 @@ export const createProduct =
             $6, $7, $8, $9, $10,
             $11, $12, $13, $14, $15,
             $16, $17, $18, $19,
-            $20, $21
+            $20
 
           )
           RETURNING *
           `,
-          [
 
-            newProduct.id,
+          [
 
             newProduct.name,
 
@@ -293,46 +340,60 @@ export const createProduct =
 
 
 
+
       // CREATED PRODUCT
       const createdProduct =
         result.rows[0];
 
 
 
-      // INSERT IMAGES INTO
-      // product_images TABLE
-      for (
-        let i = 0;
-        i < uploadedImages.length;
-        i++
-      ) {
 
-        await pool.query(
-          `
-          INSERT INTO product_images
-          (
-            product_id,
-            image_path,
-            is_main,
-            display_order,
-            alt_text
-          )
-          VALUES
-          ($1,$2,$3,$4,$5)
-          `,
-          [
-            createdProduct.id,
+      // INSERT IMAGES
+      // INTO product_images TABLE
 
-            uploadedImages[i],
+      if (uploadedImages.length > 0) {
 
-            i === 0,
+        for (
 
-            i + 1,
+          let i = 0;
 
-            createdProduct.name
-          ]
-        );
+          i < uploadedImages.length;
+
+          i++
+
+        ) {
+
+          await pool.query(
+
+            `
+            INSERT INTO product_images
+            (
+              product_id,
+              image_path,
+              is_main,
+              display_order,
+              alt_text
+            )
+            VALUES
+            ($1,$2,$3,$4,$5)
+            `,
+
+            [
+
+              createdProduct.id,
+
+              uploadedImages[i],
+
+              i === 0,
+
+              i + 1,
+
+              createdProduct.name
+            ]
+          );
+        }
       }
+
 
 
 
@@ -355,6 +416,208 @@ export const createProduct =
       });
     }
   };
+
+// export const createProduct =
+//   async (req, res) => {
+
+//     try {
+
+//       // CREATE IMAGE PATHS
+//       const uploadedImages =
+//         req.files.map(
+//           (file) =>
+//             `/images/products/${file.filename}`
+//         );
+
+
+
+//       // CREATE PRODUCT OBJECT
+//       const newProduct =
+//         createNewProduct({
+
+//           ...req.body,
+
+//           img: uploadedImages
+//         });
+
+
+
+//       // INSERT PRODUCT
+//       const result =
+//         await pool.query(
+//           `
+//           INSERT INTO products (
+
+//             id,
+
+//             name,
+
+//             description,
+
+//             price,
+
+//             original_price,
+
+//             discount,
+
+//             stock,
+
+//             rating,
+
+//             reviews,
+
+//             category,
+
+//             sub_category,
+
+//             brand,
+
+//             gender,
+
+//             age_group,
+
+//             colors,
+
+//             sizes,
+
+//             material,
+
+//             img,
+
+//             total_items,
+
+//             sold,
+
+//             featured
+
+//           )
+//           VALUES (
+
+//             $1, $2, $3, $4, $5,
+//             $6, $7, $8, $9, $10,
+//             $11, $12, $13, $14, $15,
+//             $16, $17, $18, $19,
+//             $20, $21
+
+//           )
+//           RETURNING *
+//           `,
+//           [
+
+//             newProduct.id,
+
+//             newProduct.name,
+
+//             newProduct.description,
+
+//             newProduct.price,
+
+//             newProduct.original_price,
+
+//             newProduct.discount,
+
+//             newProduct.stock,
+
+//             newProduct.rating,
+
+//             newProduct.reviews,
+
+//             newProduct.category,
+
+//             newProduct.sub_category,
+
+//             newProduct.brand,
+
+//             newProduct.gender,
+
+//             newProduct.age_group,
+
+//             JSON.stringify(
+//               newProduct.colors
+//             ),
+
+//             JSON.stringify(
+//               newProduct.sizes
+//             ),
+
+//             newProduct.material,
+
+//             JSON.stringify(
+//               uploadedImages
+//             ),
+
+//             newProduct.total_items,
+
+//             newProduct.sold,
+
+//             newProduct.featured
+//           ]
+//         );
+
+
+
+//       // CREATED PRODUCT
+//       const createdProduct =
+//         result.rows[0];
+
+
+
+//       // INSERT IMAGES INTO
+//       // product_images TABLE
+//       for (
+//         let i = 0;
+//         i < uploadedImages.length;
+//         i++
+//       ) {
+
+//         await pool.query(
+//           `
+//           INSERT INTO product_images
+//           (
+//             product_id,
+//             image_path,
+//             is_main,
+//             display_order,
+//             alt_text
+//           )
+//           VALUES
+//           ($1,$2,$3,$4,$5)
+//           `,
+//           [
+//             createdProduct.id,
+
+//             uploadedImages[i],
+
+//             i === 0,
+
+//             i + 1,
+
+//             createdProduct.name
+//           ]
+//         );
+//       }
+
+
+
+//       return res.status(201).json({
+
+//         success: true,
+
+//         product: createdProduct
+//       });
+
+//     } catch (error) {
+
+//       console.log(error);
+
+//       return res.status(500).json({
+
+//         success: false,
+
+//         error: error.message
+//       });
+//     }
+//   };
 
 
 /* =========================================

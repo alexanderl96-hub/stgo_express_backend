@@ -5,7 +5,7 @@ import path from "path";
 import fs from "fs";
 
 
-
+// https://stgo-express-backend.onrender.com/images/products/filename.png
 
 // CREATE FOLDER IF NOT EXISTS
 const uploadPath =
