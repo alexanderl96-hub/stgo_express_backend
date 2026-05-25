@@ -22,7 +22,12 @@ router.get("/", getProducts);
 
 router.get("/:id", getProductById);
 
-router.post("/create", createProduct);
+// router.post("/create", createProduct);
+router.post(
+  "/create",
+  upload.array("images", 10),
+  createProduct
+);
 
 router.put("/:id", updateProduct);
 
