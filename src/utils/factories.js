@@ -337,91 +337,88 @@ export const findOrderEverywhere = (
 // CRUD for products
 
 export const createNewProduct = ({
-  type = "",
   name = "",
-  category = "",
-  sub_category = "",
-  colors = [],
-  brand = "",
-  sizes = [],
-  length = "",
-  store = "",
-  likes = 0,
-  dollar_price = 0,
-  current_dollar_price = 0,
-  price = 0,
-  original_price = 0,
-  total_items = 0,
-  stock = 0,
-  discount = 0,
   description = "",
-  gender = [],
-  age_group = 0,
-  rating = 0,
-  reviews = 0,
-  sold = 0,
-  img = [],
-  status = "normal",
-  date = new Date().toLocaleString(),
-  qrCode = "",
-  material = ""
+  price = 0,
+    dollar_price = 0,
+    current_dollar_price = 0,
+    original_price = 0,
+    discount = 0,
+    stock = 0,
+    rating = 0,
+    reviews = 0,
+    category = "",
+    sub_category = "",
+    brand = "",
+    gender = [],
+    age_group = 0,
+    colors = [],
+    sizes = [],
+    material = "",
+    img = [],
+    total_items = 0,
+    sold = 0,
+    featured = false,
+
+    status = "created",
+    likes = 0,
+
+    date = new Date().toLocaleString(),
+    qrCode = "",
+
 }) => {
 
   return {
 
     id: Date.now(),
 
-    type,
-
     name,
 
-    category,
+    description,
 
-    sub_category,
-
-    colors,
-
-    brand,
-
-    sizes,
-
-    length,
-
-    store,
-
-    likes,
+    price,
 
     dollar_price,
 
     current_dollar_price,
 
-    price,
-
     original_price,
 
     discount,
 
-    material,
-
-    total_items,
-
     stock,
-
-    sold,
-
-    description,
-
-    gender,
-
-    age_group,
 
     rating,
 
     reviews,
 
+    category,
+
+    sub_category,
+
+    brand,
+
+    gender,
+
+    age_group,
+
+    colors,
+
+    sizes,
+
+    material,
+
     img,
 
+    total_items,
+
+    sold,
+
+    featured,
+
     status,
+
+    likes,
 
     date,
 

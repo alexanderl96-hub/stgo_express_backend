@@ -161,30 +161,9 @@ export const createProduct =
 
       console.log("BODY:", req.body);
 
-        console.log("FILES:", req.files);
-
-        console.log("COLORS:", req.body.colors);
-
-        console.log("SIZES:", req.body.sizes);
-
-
       // SUPPORT BOTH:
       // 1. Uploaded files
       // 2. Manual img array
-
-    //   const uploadedImages =
-
-    //     req.files &&
-    //     req.files.length > 0
-
-    //       ? req.files.map(
-
-    //           (file) =>
-
-    //             `/images/products/${file.filename}`
-    //         )
-
-    //       : req.body.img || [];
 
     const uploadedImages =
 
@@ -289,7 +268,19 @@ export const createProduct =
 
             sold,
 
-            featured
+            featured,
+
+            dollar_price,
+
+            current_dollar_price,
+
+            status,
+
+            likes,
+
+            qrcode,
+
+            date
 
           )
           VALUES (
@@ -298,7 +289,8 @@ export const createProduct =
             $6, $7, $8, $9, $10,
             $11, $12, $13, $14, $15,
             $16, $17, $18, $19,
-            $20, $21
+            $20, $21, $22, $23, $24, 
+            $25, $26, $27
 
           )
           RETURNING *
@@ -351,7 +343,19 @@ export const createProduct =
 
             newProduct.sold,
 
-            newProduct.featured
+            newProduct.featured,
+
+            newProduct.dollar_price,
+
+            newProduct.current_dollar_price,
+
+            newProduct.status,
+
+            newProduct.likes,
+
+            newProduct.qrCode,
+
+            newProduct.date
           ]
         );
 
@@ -362,7 +366,7 @@ export const createProduct =
       const createdProduct =
         result.rows[0];
 
-
+      console.log("createdProduct", createdProduct)
 
 
       // INSERT IMAGES
@@ -412,6 +416,36 @@ export const createProduct =
       }
 
 
+      // CREATE QR PATH
+    const qrCodePath =
+
+    `https://stgo-express-backend.onrender.com/qrcode/${createdProduct.id}`;
+
+
+
+
+    // UPDATE PRODUCT QRCODE
+    await pool.query(
+
+    `
+    UPDATE products
+    SET qrcode = $1
+    WHERE id = $2
+    `,
+
+    [
+        qrCodePath,
+        createdProduct.id
+    ]
+    );
+
+
+
+
+    // UPDATE LOCAL OBJECT
+    createdProduct.qrcode =
+    qrCodePath;
+
 
 
       return res.status(201).json({
@@ -434,207 +468,6 @@ export const createProduct =
     }
   };
 
-// export const createProduct =
-//   async (req, res) => {
-
-//     try {
-
-//       // CREATE IMAGE PATHS
-//       const uploadedImages =
-//         req.files.map(
-//           (file) =>
-//             `/images/products/${file.filename}`
-//         );
-
-
-
-//       // CREATE PRODUCT OBJECT
-//       const newProduct =
-//         createNewProduct({
-
-//           ...req.body,
-
-//           img: uploadedImages
-//         });
-
-
-
-//       // INSERT PRODUCT
-//       const result =
-//         await pool.query(
-//           `
-//           INSERT INTO products (
-
-//             id,
-
-//             name,
-
-//             description,
-
-//             price,
-
-//             original_price,
-
-//             discount,
-
-//             stock,
-
-//             rating,
-
-//             reviews,
-
-//             category,
-
-//             sub_category,
-
-//             brand,
-
-//             gender,
-
-//             age_group,
-
-//             colors,
-
-//             sizes,
-
-//             material,
-
-//             img,
-
-//             total_items,
-
-//             sold,
-
-//             featured
-
-//           )
-//           VALUES (
-
-//             $1, $2, $3, $4, $5,
-//             $6, $7, $8, $9, $10,
-//             $11, $12, $13, $14, $15,
-//             $16, $17, $18, $19,
-//             $20, $21
-
-//           )
-//           RETURNING *
-//           `,
-//           [
-
-//             newProduct.id,
-
-//             newProduct.name,
-
-//             newProduct.description,
-
-//             newProduct.price,
-
-//             newProduct.original_price,
-
-//             newProduct.discount,
-
-//             newProduct.stock,
-
-//             newProduct.rating,
-
-//             newProduct.reviews,
-
-//             newProduct.category,
-
-//             newProduct.sub_category,
-
-//             newProduct.brand,
-
-//             newProduct.gender,
-
-//             newProduct.age_group,
-
-//             JSON.stringify(
-//               newProduct.colors
-//             ),
-
-//             JSON.stringify(
-//               newProduct.sizes
-//             ),
-
-//             newProduct.material,
-
-//             JSON.stringify(
-//               uploadedImages
-//             ),
-
-//             newProduct.total_items,
-
-//             newProduct.sold,
-
-//             newProduct.featured
-//           ]
-//         );
-
-
-
-//       // CREATED PRODUCT
-//       const createdProduct =
-//         result.rows[0];
-
-
-
-//       // INSERT IMAGES INTO
-//       // product_images TABLE
-//       for (
-//         let i = 0;
-//         i < uploadedImages.length;
-//         i++
-//       ) {
-
-//         await pool.query(
-//           `
-//           INSERT INTO product_images
-//           (
-//             product_id,
-//             image_path,
-//             is_main,
-//             display_order,
-//             alt_text
-//           )
-//           VALUES
-//           ($1,$2,$3,$4,$5)
-//           `,
-//           [
-//             createdProduct.id,
-
-//             uploadedImages[i],
-
-//             i === 0,
-
-//             i + 1,
-
-//             createdProduct.name
-//           ]
-//         );
-//       }
-
-
-
-//       return res.status(201).json({
-
-//         success: true,
-
-//         product: createdProduct
-//       });
-
-//     } catch (error) {
-
-//       console.log(error);
-
-//       return res.status(500).json({
-
-//         success: false,
-
-//         error: error.message
-//       });
-//     }
-//   };
 
 
 /* =========================================
