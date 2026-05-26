@@ -10,152 +10,8 @@ import {
    CREATE PRODUCT
 ========================================= */
 
-// export const createProduct =
-//   async (req, res) => {
 
-//     try {
-
-//       const newProduct =
-//         createNewProduct(req.body);
-
-
-
-//       const result =
-//         await pool.query(
-//           `
-//           INSERT INTO products (
-
-//             id,
-
-//             name,
-
-//             description,
-
-//             price,
-
-//             original_price,
-
-//             discount,
-
-//             stock,
-
-//             rating,
-
-//             reviews,
-
-//             category,
-
-//             sub_category,
-
-//             brand,
-
-//             gender,
-
-//             age_group,
-
-//             colors,
-
-//             sizes,
-
-//             material,
-
-//             img,
-
-//             total_items,
-
-//             sold,
-
-//             featured
-
-//           )
-//           VALUES (
-
-//             $1, $2, $3, $4, $5,
-//             $6, $7, $8, $9, $10,
-//             $11, $12, $13, $14, $15,
-//             $16, $17, $18, $19, 
-//             $20, $21
-           
-
-//           )
-//           RETURNING *
-//           `,
-//           [
-
-//             newProduct.id,
-
-//             newProduct.name,
-
-//             newProduct.description,
-
-//             newProduct.price,
-
-//             newProduct.original_price,
-
-//             newProduct.discount,
-
-//             newProduct.stock,
-
-//             newProduct.rating,
-
-//             newProduct.reviews,
-
-//             newProduct.category,
-
-//             newProduct.sub_category,
-
-//             newProduct.brand,
-
-//             newProduct.gender,
-
-//             newProduct.age_group,
-
-//             JSON.stringify(
-//               newProduct.colors
-//             ),
-
-//             JSON.stringify(
-//               newProduct.sizes
-//             ),
-
-//             newProduct.material,
-
-//             JSON.stringify(
-//               newProduct.img
-//             ),
-
-//             newProduct.total_items,
-
-//             newProduct.sold,
-
-//             newProduct.featured
-//           ]
-//         );
-
-
-
-//       return res.status(201).json({
-
-//         success: true,
-
-//         product: result.rows[0]
-//       });
-
-//     } catch (error) {
-
-//       console.log(error);
-
-//       return res.status(500).json({
-
-//         success: false,
-
-//         error: error.message
-//       });
-//     }
-//   };
-
-export const createProduct =
-  async (req, res) => {
+export const createProduct = async (req, res) => {
 
     try {
 
@@ -468,14 +324,11 @@ export const createProduct =
     }
   };
 
-
-
 /* =========================================
    GET PRODUCTS
 ========================================= */
 
-export const getProducts =
-  async (req, res) => {
+export const getProducts = async (req, res) => {
 
     try {
 
@@ -508,13 +361,11 @@ export const getProducts =
   };
 
 
-
 /* =========================================
    GET PRODUCT BY ID
 ========================================= */
 
-export const getProductById =
-  async (req, res) => {
+export const getProductById = async (req, res) => {
 
     try {
 
@@ -566,13 +417,11 @@ export const getProductById =
   };
 
 
-
 /* =========================================
    UPDATE PRODUCT
 ========================================= */
 
-export const updateProduct =
-  async (req, res) => {
+export const updateProduct = async (req, res) => {
 
     try {
 
@@ -658,8 +507,7 @@ export const updateProduct =
    DELETE PRODUCT
 ========================================= */
 
-export const deleteProduct =
-  async (req, res) => {
+export const deleteProduct = async (req, res) => {
 
     try {
 
@@ -700,8 +548,7 @@ export const deleteProduct =
 
 
 
-export const getProductByQRCode =
-  async (req, res) => {
+export const getProductByQRCode = async (req, res) => {
 
     try {
 

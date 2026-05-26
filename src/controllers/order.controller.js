@@ -223,8 +223,7 @@ export const createOrder = async (
    GET ALL ORDERS
 ========================================= */
 
-export const getAllOrders =
-  async (req, res) => {
+export const getAllOrders = async (req, res) => {
 
     try {
 
@@ -274,8 +273,7 @@ export const getAllOrders =
    GET ONE ORDER
 ========================================= */
 
-export const getOrderById =
-  async (req, res) => {
+export const getOrderById = async (req, res) => {
 
     try {
 
@@ -334,8 +332,7 @@ export const getOrderById =
    UPDATE ORDER
 ========================================= */
 
-export const updateOrder =
-  async (req, res) => {
+export const updateOrder = async (req, res) => {
 
     try {
 
@@ -416,13 +413,12 @@ export const updateOrder =
     }
   };
 
-  
+
 /* =========================================
    DELETE ORDER
 ========================================= */
 
-export const deleteOrder =
-  async (req, res) => {
+export const deleteOrder = async (req, res) => {
 
     try {
 

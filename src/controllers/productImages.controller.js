@@ -77,8 +77,6 @@ export const createProductImage = async (req, res) => {
 };
 
 
-
-
 // GET ALL PRODUCT IMAGES
 export const getProductImages = async (req, res) => {
   try {
@@ -108,8 +106,6 @@ export const getProductImages = async (req, res) => {
 
   }
 };
-
-
 
 
 // GET IMAGES BY PRODUCT ID
@@ -145,9 +141,6 @@ export const getProductImagesByProductId = async (req, res) => {
 
   }
 };
-
-
-
 
 // UPDATE PRODUCT IMAGE
 export const updateProductImage = async (req, res) => {
@@ -208,8 +201,6 @@ export const updateProductImage = async (req, res) => {
 
   }
 };
-
-
 
 
 // DELETE PRODUCT IMAGE

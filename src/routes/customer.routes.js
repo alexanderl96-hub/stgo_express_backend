@@ -13,7 +13,6 @@ const router = express.Router();
 
 // Verify credentials
 
-// router.post("/register", register);
 router.post("/register", createCustomer);
 router.post("/login", login);
 router.get("/profile", protect, (req, res) => {
