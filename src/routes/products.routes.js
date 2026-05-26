@@ -2,13 +2,18 @@ import express from "express";
 import {   createProduct,
   getProducts,
   getProductById,
-
   updateProduct,
-
-  deleteProduct
+  deleteProduct,
+  getProductByQRCode
  } from "../controllers/products.contollers.js";
 import { protect } from "../middleware/auth.middleware.js";
 import upload from "../config/multer.js";
+
+// import {
+
+//   getProductByQRCode
+
+// } from "../controllers/products.controllers.js";
 
 const router = express.Router();
 
@@ -33,5 +38,10 @@ router.post(
 router.put("/:id", updateProduct);
 
 router.delete("/:id", deleteProduct);
+
+router.get(
+  "/qrcode/:id",
+  getProductByQRCode
+);
 
 export default router;
