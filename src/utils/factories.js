@@ -365,6 +365,7 @@ export const createNewProduct = ({
 
     date = new Date().toLocaleString(),
     qrCode = "",
+    store = ""
 
 }) => {
 
@@ -422,7 +423,9 @@ export const createNewProduct = ({
 
     date,
 
-    qrCode
+    qrCode,
+
+    store
   };
 };
 
@@ -571,3 +574,36 @@ export const deleteProduct = (
       Number(productId)
   );
 };
+
+
+
+
+
+
+
+// export const getDollarPrice = async () => {
+
+//     try {
+
+//       const response =
+//         await fetch(
+//           // "https://tasas.eltoque.com/v1/trmi"
+//           "https://open.er-api.com/v6/latest/USD"
+//         );
+
+//       const data =
+//         await response.json();
+
+
+//      console.log(data)
+
+//       // return data.usd.value;
+//        return data.rates.CUP || 0;
+
+//     } catch (error) {
+
+//       console.log(error);
+
+//       return 0;
+//     }
+//   };

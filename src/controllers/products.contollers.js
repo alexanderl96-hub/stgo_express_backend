@@ -1,8 +1,11 @@
 import pool from "../config/db.js";
 
 import {
-  createNewProduct
+  createNewProduct,
+  // getDollarPrice
 } from "../utils/factories.js";
+
+// import { getDollarPrice } from "./dolar.controllers.js"
 
 
 
@@ -15,7 +18,7 @@ export const createProduct = async (req, res) => {
 
     try {
 
-      console.log("BODY:", req.body);
+    //   console.log("BODY:", req.body);
 
       // SUPPORT BOTH:
       // 1. Uploaded files
@@ -59,7 +62,13 @@ export const createProduct = async (req, res) => {
 
           : req.body.sizes;
 
+    // const currentDollarPrice =
 
+    //          await getDollarPrice();
+
+    
+
+    // console.log("current", currentDollarPrice)
 
 
       // CREATE PRODUCT OBJECT
@@ -73,6 +82,8 @@ export const createProduct = async (req, res) => {
           sizes: parsedSizes,
 
           img: uploadedImages
+
+        //   current_dollar_price: currentDollarPrice
         });
 
 
@@ -136,7 +147,9 @@ export const createProduct = async (req, res) => {
 
             qrcode,
 
-            date
+            date,
+
+            store
 
           )
           VALUES (
@@ -146,7 +159,7 @@ export const createProduct = async (req, res) => {
             $11, $12, $13, $14, $15,
             $16, $17, $18, $19,
             $20, $21, $22, $23, $24, 
-            $25, $26, $27
+            $25, $26, $27, $28
 
           )
           RETURNING *
@@ -211,7 +224,9 @@ export const createProduct = async (req, res) => {
 
             newProduct.qrCode,
 
-            newProduct.date
+            newProduct.date,
+
+            newProduct.store
           ]
         );
 
