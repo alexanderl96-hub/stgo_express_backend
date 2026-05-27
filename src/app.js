@@ -60,6 +60,8 @@ import categoryRoutes from "./routes/category.routes.js";
 import colorRoutes from "./routes/color.routes.js";
 import passwordRoutes from "./routes/password.routes.js";
 import productImagesRoutes from "./routes/productImages.routes.js";
+import qrcode from "./routes/productQRCode.routes.js"
+
 
 import path from "path";
 import { fileURLToPath } from "url";
@@ -124,6 +126,8 @@ app.get("/", (req, res) => {
 
 // ROUTES
 app.use("/api/products", productsRoutes);
+
+app.use("/qrcode", qrcode);
 
 app.use("/api/admin", adminRoutes);
 

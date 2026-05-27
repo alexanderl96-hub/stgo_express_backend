@@ -3,8 +3,7 @@ import {   createProduct,
   getProducts,
   getProductById,
   updateProduct,
-  deleteProduct,
-  getProductByQRCode
+  deleteProduct
  } from "../controllers/products.contollers.js";
 import { protect } from "../middleware/auth.middleware.js";
 import upload from "../config/multer.js";
@@ -26,9 +25,5 @@ router.put("/:id", updateProduct);
 
 router.delete("/:id", deleteProduct);
 
-router.get(
-  "/qrcode/:id",
-  getProductByQRCode
-);
 
 export default router;

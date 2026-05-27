@@ -290,9 +290,9 @@ export const createProduct = async (req, res) => {
       // CREATE QR PATH
     const qrCodePath =
 
+    // `http://localhost:5001/qrcode/${createdProduct.id}`;
+
     `https://stgo-express-backend.onrender.com/qrcode/${createdProduct.id}`;
-
-
 
 
     // UPDATE PRODUCT QRCODE
@@ -563,64 +563,64 @@ export const deleteProduct = async (req, res) => {
 
 
 
-export const getProductByQRCode = async (req, res) => {
-
-    try {
-
-      const { id } = req.params;
+//     try {
 
 
 
+//       const { id } = req.params;
 
-      const result =
-        await pool.query(
-
-          `
-          SELECT *
-          FROM products
-          WHERE id = $1
-          `,
-
-          [id]
-        );
+//      console.log(req)
 
 
+//       const result =
+//         await pool.query(
 
+//           `
+//           SELECT *
+//           FROM products
+//           WHERE id = $1
+//           `,
 
-      if (
-        result.rows.length === 0
-      ) {
-
-        return res.status(404).json({
-
-          success: false,
-
-          message:
-            "Product not found"
-        });
-      }
+//           [id]
+//         );
 
 
 
 
-      return res.status(200).json({
+//       if (
+//         result.rows.length === 0
+//       ) {
 
-        success: true,
+//         return res.status(404).json({
 
-        product:
-          result.rows[0]
-      });
+//           success: false,
 
-    } catch (error) {
+//           message:
+//             "Product not found"
+//         });
+//       }
 
-      console.log(error);
 
-      return res.status(500).json({
 
-        success: false,
 
-        error:
-          error.message
-      });
-    }
-  };
+//       return res.status(200).json({
+
+//         success: true,
+
+//         product:
+//           result.rows[0]
+//       });
+
+//     } catch (error) {
+
+//       console.log(error);
+
+//       return res.status(500).json({
+
+//         success: false,
+
+//         error:
+//           error.message
+//       });
+//     }
+//   };
