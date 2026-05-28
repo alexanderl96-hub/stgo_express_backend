@@ -63,7 +63,7 @@
 // export default upload;
 
 
-import multer from "multer";
+// import multer from "multer";
 import path from "path";
 import fs from "fs";
 import crypto from "crypto";
@@ -72,53 +72,101 @@ import crypto from "crypto";
 
 
 
-// CREATE FOLDER IF NOT EXISTS
-const uploadPath =
-  "src/source/images/products";
+// // CREATE FOLDER IF NOT EXISTS
+// const uploadPath =
+//   "src/source/images/products";
 
-if (!fs.existsSync(uploadPath)) {
+// if (!fs.existsSync(uploadPath)) {
 
-  fs.mkdirSync(uploadPath, {
-    recursive: true
-  });
+//   fs.mkdirSync(uploadPath, {
+//     recursive: true
+//   });
+// }
+
+
+
+// // STORAGE CONFIG
+// const storage =
+//   multer.diskStorage({
+
+//     destination: (
+//       req,
+//       file,
+//       cb
+//     ) => {
+
+//       cb(null, uploadPath);
+//     },
+
+
+
+//     filename: (
+//       req,
+//       file,
+//       cb
+//     ) => {
+
+//       const uniqueName =
+//         `${Date.now()}-${crypto.randomUUID()}${path.extname(file.originalname)}`;
+
+//       cb(null, uniqueName);
+//     }
+//   });
+
+
+
+
+// // EXPORT
+// const upload = multer({
+//   storage
+// });
+
+// export default upload;
+
+import multer from "multer";
+
+import {
+  CloudinaryStorage
 }
+from "multer-storage-cloudinary";
+
+import cloudinary
+from "../config/cloudinary.js";
 
 
 
-// STORAGE CONFIG
 const storage =
-  multer.diskStorage({
+  new CloudinaryStorage({
 
-    destination: (
+    cloudinary,
+
+    params: async (
       req,
-      file,
-      cb
-    ) => {
+      file
+    ) => ({
 
-      cb(null, uploadPath);
-    },
+      folder: "products",
 
+      allowed_formats: [
+        "jpg",
+        "jpeg",
+        "png",
+        "webp",
+        "avif"
+      ],
 
-
-    filename: (
-      req,
-      file,
-      cb
-    ) => {
-
-      const uniqueName =
-        `${Date.now()}-${crypto.randomUUID()}${path.extname(file.originalname)}`;
-
-      cb(null, uniqueName);
-    }
+      public_id:
+        `${Date.now()}-${file.originalname}`
+    })
   });
 
 
 
 
-// EXPORT
 const upload = multer({
   storage
 });
+
+
 
 export default upload;

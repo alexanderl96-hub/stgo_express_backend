@@ -32,7 +32,8 @@ export const createProduct = async (req, res) => {
 
                 ? req.files.map(
                     (file) =>
-                    `/images/products/${file.filename}`
+                    // `/images/products/${file.filename}`
+                    file.path
                 )
 
                 : req.body.img || [];
