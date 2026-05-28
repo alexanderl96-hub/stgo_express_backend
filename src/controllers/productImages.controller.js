@@ -1,6 +1,8 @@
 // src/controllers/products/productImages.controller.js
 
 import pool from "../config/db.js";
+import cloudinary
+from "../config/cloudinary.js";
 
 
 // CREATE PRODUCT IMAGE
@@ -204,42 +206,138 @@ export const updateProductImage = async (req, res) => {
 
 
 // DELETE PRODUCT IMAGE
-export const deleteProductImage = async (req, res) => {
+// export const deleteProductImage = async (req, res) => {
+//   try {
+
+//     const { id } = req.params;
+
+//     const deletedImage = await pool.query(
+//       `
+//       DELETE FROM product_images
+//       WHERE image_id = $1
+//       RETURNING *
+//       `,
+//       [id]
+//     );
+
+
+//     if (deletedImage.rows.length === 0) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Image not found"
+//       });
+//     }
+
+
+//     return res.status(200).json({
+//       success: true,
+//       image: deletedImage.rows[0]
+//     });
+
+//   } catch (error) {
+
+//     console.log(error);
+
+//     return res.status(500).json({
+//       success: false,
+//       message: error.message
+//     });
+
+//   }
+// };
+
+
+export const deleteProductImage =
+async (req, res) => {
+
   try {
 
     const { id } = req.params;
 
-    const deletedImage = await pool.query(
-      `
-      DELETE FROM product_images
-      WHERE image_id = $1
-      RETURNING *
-      `,
-      [id]
-    );
 
 
-    if (deletedImage.rows.length === 0) {
+    // GET IMAGE FIRST
+    const imageResult =
+      await pool.query(
+
+        `
+        SELECT *
+        FROM product_images
+        WHERE image_id = $1
+        `,
+
+        [id]
+      );
+
+
+
+    if (
+      imageResult.rows.length === 0
+    ) {
+
       return res.status(404).json({
+
         success: false,
-        message: "Image not found"
+
+        message:
+          "Image not found"
       });
     }
 
 
+
+    const image =
+      imageResult.rows[0];
+
+
+
+    // DELETE FROM CLOUDINARY
+    if (image.public_id) {
+
+      await cloudinary
+        .uploader
+        .destroy(
+          image.public_id
+        );
+    }
+
+
+
+    // DELETE FROM DATABASE
+    const deletedImage =
+      await pool.query(
+
+        `
+        DELETE FROM product_images
+        WHERE image_id = $1
+        RETURNING *
+        `,
+
+        [id]
+      );
+
+
+
     return res.status(200).json({
+
       success: true,
-      image: deletedImage.rows[0]
+
+      image:
+        deletedImage.rows[0]
     });
+
+
 
   } catch (error) {
 
     console.log(error);
 
     return res.status(500).json({
-      success: false,
-      message: error.message
-    });
 
+      success: false,
+
+      message:
+        error.message
+    });
   }
 };

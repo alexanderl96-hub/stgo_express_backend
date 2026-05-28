@@ -31,10 +31,13 @@ export const createProduct = async (req, res) => {
             req.files.length > 0
 
                 ? req.files.map(
-                    (file) =>
-                    // `/images/products/${file.filename}`
-                    file.path
-                )
+                    (file) => ({
+                    // file.path
+
+                    image_path: file.path,
+
+                    public_id: file.filename
+                }))
 
                 : req.body.img || [];
 
@@ -261,21 +264,24 @@ export const createProduct = async (req, res) => {
             `
             INSERT INTO product_images
             (
-              product_id,
-              image_path,
-              is_main,
-              display_order,
-              alt_text
+                product_id,
+                image_path,
+                public_id,
+                is_main,
+                display_order,
+                alt_text
             )
             VALUES
-            ($1,$2,$3,$4,$5)
+            ($1,$2,$3,$4,$5,$6)
             `,
 
             [
 
               createdProduct.id,
 
-              uploadedImages[i],
+              uploadedImages[i].image_path,
+
+              uploadedImages[i].public_id,
 
               i === 0,
 
@@ -284,7 +290,7 @@ export const createProduct = async (req, res) => {
               createdProduct.name
             ]
           );
-        }
+        }c
       }
 
 
@@ -564,7 +570,6 @@ export const deleteProduct = async (req, res) => {
 
 
 
-//     try {
 
 
 
