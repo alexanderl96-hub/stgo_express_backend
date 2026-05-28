@@ -32,14 +32,11 @@ export const createProduct = async (req, res) => {
 
                 ? req.files.map(
                     (file) => 
-                       file.path
-                //       ({
-                //     file.path
+                      ({
+                    image_path: file.path,
 
-                //     image_path: file.path,
-
-                //     public_id: file.filename
-                // })
+                    public_id: file.filename
+                })
                 )
 
                 : req.body.img || [];
@@ -264,36 +261,36 @@ export const createProduct = async (req, res) => {
 
           await pool.query(
 
-            `
-            INSERT INTO product_images
-            (
-                product_id,
-                image_path,
-                public_id,
-                is_main,
-                display_order,
-                alt_text
-            )
-            VALUES
-            ($1, $2, $3, $4, $5, $6)
-            `,
+          `
+          INSERT INTO product_images
+          (
+            product_id,
+            image_path,
+            public_id,
+            is_main,
+            display_order,
+            alt_text
+          )
+          VALUES
+          ($1,$2,$3,$4,$5,$6)
+          `,
 
-            [
+          [
 
-              createdProduct.id,
+            createdProduct.id,
 
-              uploadedImages[i],
+            uploadedImages[i].image_path,
 
-               uploadedImages[i],
+            uploadedImages[i].public_id,
 
-              i === 0,
+            i === 0,
 
-              i + 1,
+            i + 1,
 
-              createdProduct.name
-            ]
-          );
-        }c
+            createdProduct.name
+          ]
+        );
+        }
       }
 
 
