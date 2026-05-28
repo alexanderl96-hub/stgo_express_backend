@@ -269,22 +269,22 @@ export const createProduct = async (req, res) => {
             (
                 product_id,
                 image_path,
-                
+                public_id,
                 is_main,
                 display_order,
                 alt_text
             )
             VALUES
-            ($1,$2,$3,$4,$5)
+            ($1, $2, $3, $4, $5, $6)
             `,
 
             [
 
               createdProduct.id,
 
-              uploadedImages[i].image_path,
+              uploadedImages[i],
 
-              
+               uploadedImages[i],
 
               i === 0,
 
