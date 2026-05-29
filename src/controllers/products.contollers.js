@@ -33,7 +33,7 @@ export const createProduct = async (req, res) => {
                 ? req.files.map(
                     (file) => 
                       ({
-                    image_path: file.path.slice(0, -5),
+                    image_path: file.path,
 
                     public_id: file.filename
                 })
