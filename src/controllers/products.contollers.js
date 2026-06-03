@@ -107,6 +107,10 @@ export const createProduct = async (req, res) => {
 
             price,
 
+            dollar_price,
+
+            current_dollar_price,
+
             original_price,
 
             discount,
@@ -141,17 +145,13 @@ export const createProduct = async (req, res) => {
 
             featured,
 
-            dollar_price,
-
-            current_dollar_price,
-
             status,
 
             likes,
 
-            qrcode,
-
             date,
+
+            qrCode,
 
             store
 
@@ -177,6 +177,10 @@ export const createProduct = async (req, res) => {
             newProduct.description,
 
             newProduct.price,
+
+            newProduct.dollar_price,
+
+            newProduct.current_dollar_price,
 
             newProduct.original_price,
 
@@ -218,17 +222,13 @@ export const createProduct = async (req, res) => {
 
             newProduct.featured,
 
-            newProduct.dollar_price,
-
-            newProduct.current_dollar_price,
-
             newProduct.status,
 
             newProduct.likes,
 
-            newProduct.qrCode,
-
             newProduct.date,
+
+            newProduct.qrCode,
 
             newProduct.store
           ]
