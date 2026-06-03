@@ -297,9 +297,9 @@ export const createProduct = async (req, res) => {
       // CREATE QR PATH
     const qrCodePath =
 
-    // `http://localhost:5001/qrcode/${createdProduct.id}`;
+    `http://localhost:3000/qrcode/${createdProduct.id}`;
 
-    `https://stgo-express-backend.onrender.com/qrcode/${createdProduct.id}`;
+    // `https://stgo-express-backend.onrender.com/qrcode/${createdProduct.id}`;
 
 
     // UPDATE PRODUCT QRCODE
