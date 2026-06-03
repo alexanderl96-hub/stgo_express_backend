@@ -99,7 +99,7 @@ app.use(cors({
 
     "http://localhost:3000",
 
-    "https://your-frontend-domain.com"
+    "https://stgo-ventas.onrender.com"
   ],
 
   credentials: true
