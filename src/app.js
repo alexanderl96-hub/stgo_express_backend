@@ -95,13 +95,12 @@ app.use(
 // MIDDLEWARES
 app.use(cors({
 
-  origin: [
-
+    origin: [
     "http://localhost:3000",
-
     "https://stgo-ventas.onrender.com"
   ],
-
+  methods: ["GET","POST","PUT","DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }));
 
