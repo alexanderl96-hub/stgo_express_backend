@@ -1,12 +1,8 @@
 import pool from "../config/db.js";
 
 import {
-  createNewProduct,
-  // getDollarPrice
+  createNewProduct 
 } from "../utils/factories.js";
-
-// import { getDollarPrice } from "./dolar.controllers.js"
-
 
 
 /* =========================================
@@ -66,14 +62,6 @@ export const createProduct = async (req, res) => {
 
           : req.body.sizes;
 
-    // const currentDollarPrice =
-
-    //          await getDollarPrice();
-
-    
-
-    // console.log("current", currentDollarPrice)
-
 
       // CREATE PRODUCT OBJECT
       const newProduct =
@@ -86,8 +74,6 @@ export const createProduct = async (req, res) => {
           sizes: parsedSizes,
 
           img: uploadedImages
-
-        //   current_dollar_price: currentDollarPrice
         });
 
 
@@ -153,7 +139,13 @@ export const createProduct = async (req, res) => {
 
             qrCode,
 
-            store
+            store,
+
+            caracteristics,
+
+            recommended,
+
+            battery_details
 
           )
           VALUES (
@@ -163,7 +155,8 @@ export const createProduct = async (req, res) => {
             $11, $12, $13, $14, $15,
             $16, $17, $18, $19,
             $20, $21, $22, $23, $24, 
-            $25, $26, $27, $28
+            $25, $26, $27, $28, $29,
+            $30, $31
 
           )
           RETURNING *
@@ -230,7 +223,13 @@ export const createProduct = async (req, res) => {
 
             newProduct.qrCode,
 
-            newProduct.store
+            newProduct.store,
+
+            newProduct.caracteristics,
+
+            newProduct.recommended,
+
+            newProduct.battery_details
           ]
         );
 
@@ -300,6 +299,8 @@ export const createProduct = async (req, res) => {
     // `http://localhost:3000/qrcode/${createdProduct.id}`;
 
     `https://stgo-ventas.onrender.com/qrcode/${createdProduct.id}`;
+
+    //  `https://stgo-ventas.onrender.com/qrcode/${createdProduct.id}`;
 
 
     // UPDATE PRODUCT QRCODE

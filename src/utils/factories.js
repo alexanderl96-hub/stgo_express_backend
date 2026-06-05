@@ -425,7 +425,13 @@ export const createNewProduct = ({
 
     qrCode,
 
-    store
+    store,
+
+    caracteristics,
+
+    recommended,
+
+    battery_details
   };
 };
 
