@@ -376,7 +376,10 @@ export const createNewProduct = ({
     fast_charge: "",
     solar_compatible: false,
     recommended_devices: []
-  }
+  },
+  modelo = "",
+  original_store_price = 0 
+
 
 }) => {
 
@@ -442,7 +445,11 @@ export const createNewProduct = ({
 
     recommended,
 
-    battery_details
+    battery_details,
+
+    modelo,
+
+    original_store_price
   };
 };
 

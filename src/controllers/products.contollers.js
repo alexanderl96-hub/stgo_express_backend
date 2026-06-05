@@ -105,7 +105,6 @@ export const createProduct = async (req, res) => {
 
           battery_details: parsedBatteryDetails
 
-
         });
 
 
@@ -177,7 +176,11 @@ export const createProduct = async (req, res) => {
 
             recommended,
 
-            battery_details
+            battery_details,
+
+            modelo,
+
+            original_store_price
 
           )
           VALUES (
@@ -188,7 +191,7 @@ export const createProduct = async (req, res) => {
             $16, $17, $18, $19,
             $20, $21, $22, $23, $24, 
             $25, $26, $27, $28, $29,
-            $30, $31
+            $30, $31, $32, $33
 
           )
           RETURNING *
@@ -267,7 +270,11 @@ export const createProduct = async (req, res) => {
 
             JSON.stringify(
               newProduct.battery_details
-            )
+            ),
+
+            newProduct.modelo,
+
+            newProduct.original_store_price
           ]
         );
 
