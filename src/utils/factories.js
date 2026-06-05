@@ -365,7 +365,18 @@ export const createNewProduct = ({
 
     date = new Date().toLocaleString(),
     qrCode = "",
-    store = ""
+    store = "",
+
+      caracteristics = [],
+  recommended = [],
+  battery_details = {
+    battery_type: "",
+    capacity: "",
+    ac_output: "",
+    fast_charge: "",
+    solar_compatible: false,
+    recommended_devices: []
+  }
 
 }) => {
 

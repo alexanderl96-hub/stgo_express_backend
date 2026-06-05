@@ -61,6 +61,30 @@ export const createProduct = async (req, res) => {
           ? JSON.parse(req.body.sizes)
 
           : req.body.sizes;
+      
+      const parsedCaracteristics =
+
+        typeof req.body.caracteristics === "string"
+
+          ? JSON.parse(req.body.caracteristics)
+
+          : req.body.caracteristics;
+      
+      const parsedRecommended =
+
+        typeof req.body.recommended === "string"
+
+          ? JSON.parse(req.body.recommended)
+
+          : req.body.recommended;
+
+      const parsedBatteryDetails =
+
+        typeof req.body.battery_details === "string"
+
+          ? JSON.parse(req.body.battery_details)
+
+          : req.body.battery_details;
 
 
       // CREATE PRODUCT OBJECT
@@ -73,7 +97,15 @@ export const createProduct = async (req, res) => {
 
           sizes: parsedSizes,
 
-          img: uploadedImages
+          img: uploadedImages,
+
+          caracteristics: parsedCaracteristics,
+
+          recommended: parsedRecommended,
+
+          battery_details: parsedBatteryDetails
+
+
         });
 
 
@@ -225,11 +257,17 @@ export const createProduct = async (req, res) => {
 
             newProduct.store,
 
-            newProduct.caracteristics,
+            JSON.stringify(
+              newProduct.caracteristics
+            ),
 
-            newProduct.recommended,
+            JSON.stringify(
+              newProduct.recommended
+            ),
 
-            newProduct.battery_details
+            JSON.stringify(
+              newProduct.battery_details
+            )
           ]
         );
 
