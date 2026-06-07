@@ -38,7 +38,9 @@ app.use(cors({
 
     origin: [
     "http://localhost:3000",
-    "https://stgo-ventas.onrender.com"
+    "https://stgo-ventas.onrender.com",
+    "ventas-express.netlify.app"
+
   ],
   methods: ["GET","POST","PUT","DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
