@@ -85,6 +85,14 @@ export const createProduct = async (req, res) => {
           ? JSON.parse(req.body.battery_details)
 
           : req.body.battery_details;
+      
+      const parsedColorsMatch =
+
+        typeof req.body.colors_match === "string"
+
+          ? JSON.parse(req.body.colors_match)
+
+          : req.body.colors_match;
 
 
       // CREATE PRODUCT OBJECT
@@ -103,7 +111,9 @@ export const createProduct = async (req, res) => {
 
           recommended: parsedRecommended,
 
-          battery_details: parsedBatteryDetails
+          battery_details: parsedBatteryDetails,
+
+          colors_match: parsedColorsMatch
 
         });
 
@@ -150,6 +160,8 @@ export const createProduct = async (req, res) => {
 
             colors,
 
+            colors_match,
+
             sizes,
 
             material,
@@ -182,6 +194,8 @@ export const createProduct = async (req, res) => {
 
             original_store_price
 
+           
+
           )
           VALUES (
 
@@ -191,7 +205,7 @@ export const createProduct = async (req, res) => {
             $16, $17, $18, $19,
             $20, $21, $22, $23, $24, 
             $25, $26, $27, $28, $29,
-            $30, $31, $32, $33
+            $30, $31, $32, $33, $34
 
           )
           RETURNING *
@@ -232,6 +246,10 @@ export const createProduct = async (req, res) => {
 
             JSON.stringify(
               newProduct.colors
+            ),
+
+            SON.stringify(
+              newProduct.colors_match
             ),
 
             JSON.stringify(
@@ -343,9 +361,9 @@ export const createProduct = async (req, res) => {
 
     // `http://localhost:3000/qrcode/${createdProduct.id}`;
 
-    // `https://stgo-ventas.onrender.com/qrcode/${createdProduct.id}`;
+    `https://stgo-ventas.onrender.com/#/qrcode/${createdProduct.id}`;
 
-     `https://ventas-express.netlify.app/details/${createdProduct.id}`;
+    //  `https://ventas-express.netlify.app/details/${createdProduct.id}`;
 
 
     // UPDATE PRODUCT QRCODE
@@ -748,9 +766,30 @@ async (req, res) => {
             COALESCE($25, likes),
 
           date =
-            COALESCE($26, date)
+            COALESCE($26, date),
 
-        WHERE id = $27
+          caracteristics =
+            COALESCE($27, caracteristics),
+
+          recommended =
+            COALESCE($28, recommended),
+
+          battery_details =
+            COALESCE($29, battery_details),
+
+          modelo =
+            COALESCE($30, modelo),
+
+          original_store_price =
+            COALESCE($31, original_store_price),
+
+          colors_match =
+            COALESCE($32, colors_match),
+
+          qrcode =
+            COALESCE($33, qrcode)
+
+        WHERE id = $34
 
         RETURNING *
         `,
@@ -809,6 +848,20 @@ async (req, res) => {
 
           data.date,
 
+          data.caracteristics,
+
+          data.recommended,
+
+          data.battery_details,
+
+          data.modelo,
+
+          data.original_store_price,
+
+          data.colors_match,
+
+          data.qrCode,
+          
           id
         ]
       );

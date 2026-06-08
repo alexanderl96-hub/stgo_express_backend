@@ -353,6 +353,7 @@ export const createNewProduct = ({
     gender = [],
     age_group = 0,
     colors = [],
+    colors_match = [],
     sizes = [],
     material = "",
     img = [],
@@ -367,9 +368,9 @@ export const createNewProduct = ({
     qrCode = "",
     store = "",
 
-      caracteristics = [],
-  recommended = [],
-  battery_details = {
+    caracteristics = [],
+    recommended = [],
+    battery_details = {
     battery_type: "",
     capacity: "",
     ac_output: "",
@@ -418,6 +419,8 @@ export const createNewProduct = ({
     age_group,
 
     colors,
+
+    colors_match,
 
     sizes,
 
