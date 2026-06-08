@@ -8,8 +8,6 @@ import {
 /* =========================================
    CREATE PRODUCT
 ========================================= */
-
-
 export const createProduct = async (req, res) => {
 
     try {
@@ -62,6 +60,8 @@ export const createProduct = async (req, res) => {
 
           : req.body.sizes;
       
+
+
       const parsedCaracteristics =
 
         typeof req.body.caracteristics === "string"
@@ -70,6 +70,8 @@ export const createProduct = async (req, res) => {
 
           : req.body.caracteristics;
       
+
+
       const parsedRecommended =
 
         typeof req.body.recommended === "string"
@@ -78,6 +80,8 @@ export const createProduct = async (req, res) => {
 
           : req.body.recommended;
 
+
+
       const parsedBatteryDetails =
 
         typeof req.body.battery_details === "string"
@@ -85,6 +89,8 @@ export const createProduct = async (req, res) => {
           ? JSON.parse(req.body.battery_details)
 
           : req.body.battery_details;
+
+
       
       const parsedColorsMatch =
 
@@ -410,10 +416,10 @@ export const createProduct = async (req, res) => {
     }
   };
 
+
 /* =========================================
    GET PRODUCTS
 ========================================= */
-
 export const getProducts = async (req, res) => {
 
     try {
@@ -450,7 +456,6 @@ export const getProducts = async (req, res) => {
 /* =========================================
    GET PRODUCT BY ID
 ========================================= */
-
 export const getProductById = async (req, res) => {
 
     try {
@@ -506,159 +511,6 @@ export const getProductById = async (req, res) => {
 /* =========================================
    UPDATE PRODUCT
 ========================================= */
-
-// export const updateProduct = async (req, res) => {
-
-//     try {
-
-//       const { id } = req.params;
-
-//       const data = req.body;
-
-
-//       const result =
-//         await pool.query(
-//           `
-//           UPDATE products
-
-//           SET
-
-//             name = $1,
-
-//             description = $2,
-
-//             price = $3,
-
-//             stock = $4,
-
-//             discount = $5,
-
-//             rating = $6,
-
-//             reviews = $7,
-
-//             sold = $8,
-
-//             dollar_price = $9,
-
-//             current_dollar_price = $10,
-
-//             original_price = $11,
-
-//             category = $12,
-
-//             sub_category = $13,
-
-//             brand = $14,
-
-//             gender = $15,
-
-//             age_group = $16,
-
-//             colors = $17,
-
-//             sizes = $18,
-
-//             material = $19,
-
-//             img = $20,
-
-//             total_items = $21,
-
-//             featured = $22,
-
-//             store = $23,
-
-//             status = $24,
-
-//             likes = $25, 
-
-//             date = $26
-
-//           WHERE id = $27
-
-//           RETURNING *
-//           `,
-//           [
-
-//             data.name,
-
-//             data.description,
-
-//             data.price,
-
-//             data.stock,
-
-//             data.discount,
-
-//             data.rating,
-
-//             data.reviews,
-
-//             data.sold,
-
-//             data.dollar_price,
-
-//             data.current_dollar_price,
-
-//             data.original_price ,
-
-//             data.category ,
-
-//             data.sub_category ,
-
-//             data.brand ,
-
-//             data.gender ,
-
-//             data.age_group ,
-
-//             data.colors ,
-
-//             data.sizes ,
-
-//             data.material ,
-
-//             data.img ,
-
-//             data.total_items ,
-
-//             data.featured ,
-
-//             data.store ,
-
-//             data.status ,
-
-//             data.likes , 
-
-//             data.date,
-
-//             id
-//           ]
-//         );
-
-
-
-//       return res.status(200).json({
-
-//         success: true,
-
-//         product: result.rows[0]
-//       });
-
-//     } catch (error) {
-
-//       console.log(error);
-
-//       return res.status(500).json({
-
-//         success: false,
-
-//         error: error.message
-//       });
-//     }
-//   };
-
 export const updateProduct =
 async (req, res) => {
 
@@ -861,7 +713,7 @@ async (req, res) => {
           data.colors_match,
 
           data.qrCode,
-          
+
           id
         ]
       );
@@ -909,11 +761,9 @@ async (req, res) => {
 };
 
 
-
 /* =========================================
    DELETE PRODUCT
 ========================================= */
-
 export const deleteProduct = async (req, res) => {
 
     try {
@@ -953,65 +803,3 @@ export const deleteProduct = async (req, res) => {
     }
   };
 
-
-
-
-
-
-//       const { id } = req.params;
-
-//      console.log(req)
-
-
-//       const result =
-//         await pool.query(
-
-//           `
-//           SELECT *
-//           FROM products
-//           WHERE id = $1
-//           `,
-
-//           [id]
-//         );
-
-
-
-
-//       if (
-//         result.rows.length === 0
-//       ) {
-
-//         return res.status(404).json({
-
-//           success: false,
-
-//           message:
-//             "Product not found"
-//         });
-//       }
-
-
-
-
-//       return res.status(200).json({
-
-//         success: true,
-
-//         product:
-//           result.rows[0]
-//       });
-
-//     } catch (error) {
-
-//       console.log(error);
-
-//       return res.status(500).json({
-
-//         success: false,
-
-//         error:
-//           error.message
-//       });
-//     }
-//   };
