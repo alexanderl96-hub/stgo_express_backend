@@ -343,9 +343,9 @@ export const createProduct = async (req, res) => {
 
     // `http://localhost:3000/qrcode/${createdProduct.id}`;
 
-    `https://stgo-ventas.onrender.com/qrcode/${createdProduct.id}`;
+    // `https://stgo-ventas.onrender.com/qrcode/${createdProduct.id}`;
 
-    //  `https://stgo-ventas.onrender.com/qrcode/${createdProduct.id}`;
+     `https://ventas-express.netlify.app/details/${createdProduct.id}`;
 
 
     // UPDATE PRODUCT QRCODE
