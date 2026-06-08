@@ -254,7 +254,7 @@ export const createProduct = async (req, res) => {
               newProduct.colors
             ),
 
-            SON.stringify(
+            JSON.stringify(
               newProduct.colors_match
             ),
 
