@@ -161,41 +161,113 @@ export const getCustomerById = async (req, res) => {
 };
 
 // UPDATE CUSTOMER
+// export const updateCustomer = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+
+//     const { name, email, phone, password, birthday, imagen, address, role } =
+//       req.body;
+
+//     const result = await pool.query(
+//       `
+//           UPDATE customers
+//           SET
+//             name = $1,
+//             email = $2,
+//             phone = $3,
+//             password = $4,
+//             birthday = $5,
+//             imagen = $6,
+//             address = $7,
+//             role = $8
+//           WHERE customer_id = $9
+//           RETURNING *
+//           `,
+//       [name, email, phone, password, birthday, imagen, address, role, id],
+//     );
+
+//     return res.status(200).json({
+//       success: true,
+//       user: result.rows[0],
+//     });
+//   } catch (error) {
+//     console.log(error);
+
+//     return res.status(500).json({
+//       success: false,
+//       message: "Error updating customer",
+//     });
+//   }
+// };
 export const updateCustomer = async (req, res) => {
   try {
+
     const { id } = req.params;
 
-    const { name, email, phone, password, birthday, imagen, address, role } =
-      req.body;
+    const {
+      name,
+      email,
+      phone,
+      password,
+      birthday,
+      imagen,
+      address,
+      role,
+      user_create,
+      order,
+      orderProccess,
+      delivered
+    } = req.body;
 
     const result = await pool.query(
       `
-          UPDATE customers
-          SET
-            name = $1,
-            email = $2,
-            phone = $3,
-            password = $4,
-            birthday = $5,
-            imagen = $6,
-            address = $7,
-            role = $8
-          WHERE customer_id = $9
-          RETURNING *
-          `,
-      [name, email, phone, password, birthday, imagen, address, role, id],
+      UPDATE customers
+      SET
+        name = $1,
+        email = $2,
+        phone = $3,
+        password = $4,
+        birthday = $5,
+        imagen = $6,
+        address = $7,
+        role = $8,
+        user_create = $9,
+        "order" = $10,
+        "orderProccess" = $11,
+        delivered = $12
+      WHERE customer_id = $13
+      RETURNING *
+      `,
+      [
+        name,
+        email,
+        phone,
+        password,
+        birthday,
+        imagen,
+        address,
+        role,
+        user_create,
+        JSON.stringify(order || []),
+        JSON.stringify(orderProccess || []),
+        JSON.stringify(delivered || []),
+        id
+      ]
     );
 
     return res.status(200).json({
       success: true,
-      user: result.rows[0],
+      user: result.rows[0]
     });
+
   } catch (error) {
+
     console.log(error);
 
     return res.status(500).json({
       success: false,
       message: "Error updating customer",
+      error: error.message
     });
   }
 };
