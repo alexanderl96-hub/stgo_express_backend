@@ -4,6 +4,7 @@ import {
   getCustomerById,
   createCustomer,
   updateCustomer,
+  addCustomerOrder,
   deleteCustomer,
 } from "../controllers/costumers/customer.controllers.js";
 import {  login } from "../controllers/costumers/auth.controller.js";
@@ -28,6 +29,8 @@ router.get("/", getCustomers);
 router.get("/:id", getCustomerById);
 
 router.put("/:id", updateCustomer);
+
+router.put("/:id/orders", addCustomerOrder);
 
 router.delete("/:id", deleteCustomer);
 

@@ -161,44 +161,6 @@ export const getCustomerById = async (req, res) => {
 };
 
 // UPDATE CUSTOMER
-// export const updateCustomer = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-
-//     const { name, email, phone, password, birthday, imagen, address, role } =
-//       req.body;
-
-//     const result = await pool.query(
-//       `
-//           UPDATE customers
-//           SET
-//             name = $1,
-//             email = $2,
-//             phone = $3,
-//             password = $4,
-//             birthday = $5,
-//             imagen = $6,
-//             address = $7,
-//             role = $8
-//           WHERE customer_id = $9
-//           RETURNING *
-//           `,
-//       [name, email, phone, password, birthday, imagen, address, role, id],
-//     );
-
-//     return res.status(200).json({
-//       success: true,
-//       user: result.rows[0],
-//     });
-//   } catch (error) {
-//     console.log(error);
-
-//     return res.status(500).json({
-//       success: false,
-//       message: "Error updating customer",
-//     });
-//   }
-// };
 export const updateCustomer = async (req, res) => {
   try {
 
@@ -267,6 +229,67 @@ export const updateCustomer = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Error updating customer",
+      error: error.message
+    });
+  }
+};
+
+// ADD NEW ORDER TO BY CUSTOMER
+export const addCustomerOrder = async (req, res) => {
+
+  try {
+
+    const { id } = req.params;
+    const { order } = req.body;
+
+    const customerResult = await pool.query(
+      `
+      SELECT "order"
+      FROM customers
+      WHERE customer_id = $1
+      `,
+      [id]
+    );
+
+    if (customerResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Customer not found"
+      });
+    }
+
+    const currentOrders =
+      customerResult.rows[0].order || [];
+
+    const updatedOrders = [
+      ...currentOrders,
+      order
+    ];
+
+    const result = await pool.query(
+      `
+      UPDATE customers
+      SET "order" = $1
+      WHERE customer_id = $2
+      RETURNING *
+      `,
+      [
+        JSON.stringify(updatedOrders),
+        id
+      ]
+    );
+
+    return res.json({
+      success: true,
+      customer: result.rows[0]
+    });
+
+  } catch (error) {
+
+    console.log(error);
+
+    return res.status(500).json({
+      success: false,
       error: error.message
     });
   }
