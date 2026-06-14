@@ -532,7 +532,26 @@ async (req, res) => {
       }
     });
 
+if (data.sizes) {
+  data.sizes =
+    typeof data.sizes === "string"
+      ? data.sizes
+      : JSON.stringify(data.sizes);
+}
 
+if (data.colors_match) {
+  data.colors_match =
+    typeof data.colors_match === "string"
+      ? data.colors_match
+      : JSON.stringify(data.colors_match);
+}
+
+if (data.battery_details) {
+  data.battery_details =
+    typeof data.battery_details === "string"
+      ? data.battery_details
+      : JSON.stringify(data.battery_details);
+}
 
     const result =
       await pool.query(
@@ -747,6 +766,11 @@ async (req, res) => {
 
 
   } catch (error) {
+
+    console.log("MESSAGE:", error.message);
+  console.log("DETAIL:", error.detail);
+  console.log("WHERE:", error.where);
+  console.log(error);
 
     console.log(error);
 

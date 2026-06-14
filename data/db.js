@@ -1074,3 +1074,9 @@ export const products = [
     },
 ]
 
+
+// Update categories 
+// UPDATE categories 
+// SET sub_category = sub_category || '["Protectores de Pantalla"]'::jsonb
+// WHERE category_key = 'electronicos';
+
