@@ -72,6 +72,10 @@ export const getAdminDashboard = async (req, res) => {
       `SELECT * FROM guest_orders ORDER BY id DESC`
     );
 
+    const guest = await pool.query(
+      `SELECT * FROM guest ORDER BY guestid DESC`
+    );
+
 
     // RESPONSE
     res.status(200).json({
@@ -80,6 +84,7 @@ export const getAdminDashboard = async (req, res) => {
       products: products.rows,
       admins: admins.rows,
       customers: customers.rows,
+      guest: guest.rows,
       guestOrders: guestOrders.rows
     });
 
