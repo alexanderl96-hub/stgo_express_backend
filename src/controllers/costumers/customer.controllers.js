@@ -41,7 +41,7 @@ export const getCustomersGuest = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: "Error fetching customers",
+      message: "Error fetching guest",
     });
   }
 };
