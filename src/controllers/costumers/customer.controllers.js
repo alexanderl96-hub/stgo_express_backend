@@ -1,6 +1,6 @@
 import pool from "../../config/db.js";
 
-import { createNewUser } from "../../utils/factories.js";
+import { createNewUser, createNewGuestUser } from "../../utils/factories.js";
 import bcrypt from "bcryptjs";
 
 
@@ -112,6 +112,90 @@ export const createCustomer = async (req, res) => {
         JSON.stringify(newUser.orderProccess),
 
         JSON.stringify(newUser.delivered),
+      ],
+    );
+
+    return res.status(201).json({
+      success: true,
+      user: result.rows[0],
+    });
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Error creating customer",
+    });
+  }
+};
+
+// CREATE GUEST
+export const createCustomerGuest = async (req, res) => {
+  try {
+    const { guestId, name, email, phone, address, order } =
+      req.body;
+
+    // REQUIRED FIELDS
+    if (!guestId || !name || !email || !phone || !address || !order) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields",
+      });
+    }
+
+    // CHECK IF USER EXISTS
+    const existingUser = await pool.query(
+      `
+        SELECT * FROM guest
+        WHERE email = $1
+        `,
+      [email],
+    );
+
+    if (existingUser.rows.length > 0) {
+      return res.status(409).json({
+        success: false,
+        message: "User already exists",
+      });
+    }
+
+    // CREATE USER OBJECT
+    const newUser = createNewGuestUser({
+      guestId,
+      name,
+      email,
+      phone,
+      address,
+      order
+    });
+
+    // INSERT INTO DATABASE
+    const result = await pool.query(
+      `
+      INSERT INTO guest (
+        guestId,
+        name,
+        email,
+        phone,
+        address,
+        user_create,
+        "order"
+      )
+      VALUES (
+        $1, $2, $3, $4,
+        $5, $6, $7
+      )
+      RETURNING *
+      `,
+      [
+        newUser.guestId,
+        newUser.name,
+        newUser.email,
+        newUser.phone,
+        newUser.address,
+        newUser.user_create,
+
+        JSON.stringify(newUser.order)
       ],
     );
 

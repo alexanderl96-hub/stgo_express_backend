@@ -6,6 +6,7 @@ import {
   updateCustomer,
   addCustomerOrder,
   deleteCustomer,
+  createCustomerGuest
 } from "../controllers/costumers/customer.controllers.js";
 import {  login } from "../controllers/costumers/auth.controller.js";
 import { protect } from "../middleware/auth.middleware.js";
@@ -23,6 +24,7 @@ router.get("/profile", protect, (req, res) => {
 //===============
 
 // GetRoutes
+router.post("/create-guest", createCustomerGuest);
 
 router.get("/", getCustomers);
 

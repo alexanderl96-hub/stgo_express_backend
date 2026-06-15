@@ -64,6 +64,24 @@ export const deleteUser = (users, customerId) => {
   );
 };
 
+export const createNewGuestUser = ({
+  guestId,
+  name,
+  email,
+  phone,
+  address = "",
+}) => {
+  return {
+    guestId,
+    name,
+    email,
+    phone,
+    address,
+    user_create: new Date().toLocaleString(),
+    order: [],
+  };
+};
+
 
 
 
