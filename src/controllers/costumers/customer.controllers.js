@@ -136,7 +136,7 @@ export const createCustomerGuest = async (req, res) => {
       req.body;
 
     // REQUIRED FIELDS
-    if (!guestId || !name || !email || !phone || !address || !order) {
+    if (!guestId || !name || !email || !phone || !order) {
       return res.status(400).json({
         success: false,
         message: "Missing required fields",
