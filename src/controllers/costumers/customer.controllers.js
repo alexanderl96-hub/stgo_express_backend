@@ -31,7 +31,7 @@ export const getCustomersGuest = async (req, res) => {
     const result = await pool.query(
       `
       SELECT * FROM guest
-      ORDER BY customer_id DESC
+      ORDER BY guestId DESC
       `,
     );
 
