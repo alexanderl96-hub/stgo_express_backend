@@ -25,6 +25,27 @@ export const getCustomers = async (req, res) => {
   }
 };
 
+// GET ALL GUEST
+export const getCustomersGuest = async (req, res) => {
+  try {
+    const result = await pool.query(
+      `
+      SELECT * FROM guest
+      ORDER BY customer_id DESC
+      `,
+    );
+
+    return res.status(200).json(result.rows);
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching customers",
+    });
+  }
+};
+
 // CREATE CUSTOMER
 export const createCustomer = async (req, res) => {
   try {
