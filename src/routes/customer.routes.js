@@ -26,7 +26,7 @@ router.get("/profile", protect, (req, res) => {
 
 // GetRoutes
 router.post("/create-guest", createCustomerGuest);
-router.post("/guest", getCustomersGuest);
+router.get("/guest", getCustomersGuest);
 
 router.get("/", getCustomers);
 
