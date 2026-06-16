@@ -7,7 +7,8 @@ import {
   addCustomerOrder,
   deleteCustomer,
   createCustomerGuest,
-  getCustomersGuest
+  getCustomersGuest,
+  updateOrderStatus
 } from "../controllers/costumers/customer.controllers.js";
 import {  login } from "../controllers/costumers/auth.controller.js";
 import { protect } from "../middleware/auth.middleware.js";
@@ -27,6 +28,10 @@ router.get("/profile", protect, (req, res) => {
 // GetRoutes
 router.post("/create-guest", createCustomerGuest);
 router.get("/guest", getCustomersGuest);
+router.put(
+  "/:customerId/orders/:orderId/status",
+  updateOrderStatus
+);
 
 router.get("/", getCustomers);
 
