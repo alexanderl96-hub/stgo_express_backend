@@ -429,201 +429,357 @@ export const updateOrder = async (req, res) => {
   }
 };
 
+
 // export const deleteInOrderAndUser = async (req, res) => {
-//     const { customerId, orderId } = req.params;
+//   const { customerId, orderId } = req.params;
 
-//     try {
+//   try {
 
-//       const customerResult = await pool.query(
+//     let tableName = "customers";
+
+//     let result = await pool.query(
+//       `
+//       SELECT "order"
+//       FROM customers
+//       WHERE customer_id = $1
+//       `,
+//       [customerId]
+//     );
+
+//     // If not found in customers, try guest
+//     if (!result.rows.length) {
+
+//       tableName = "guest";
+
+//       result = await pool.query(
 //         `
 //         SELECT "order"
-//         FROM customers
-//         WHERE customer_id = $1
+//         FROM guest
+//         WHERE guestid = $1
 //         `,
 //         [customerId]
 //       );
+//     }
 
-//       if (!customerResult.rows.length) {
-//         return res.status(404).json({
-//           success: false,
-//           message: "Customer not found"
-//         });
-//       }
+//     if (!result.rows.length) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Customer/Guest not found"
+//       });
+//     }
 
-//       const ordersArray =
-//         customerResult.rows[0].order || [];
+//     const ordersArray =
+//       result.rows[0].order || [];
 
-//       const updatedOrders =
+//     const orderProccessArray =
+//       result.rows[0].orderProccess || [];
+
+//     const orderDeliveredArray =
+//       result.rows[0].delivered || [];
+
+//     const updatedOrders =
+//       ordersArray.filter(
+//         order =>
+//           Number(order.id) !== Number(orderId)
+//       );
+
+//     const updatedOrderProccess =
+//       orderProccessArray.filter(
+//         order =>
+//           Number(order.id) !== Number(orderId)
+//       );
+
+//     // Update correct table
+//     if (tableName === "customers") {
+
+//       await pool.query(
+//         `
+//         UPDATE customers
+//         SET
+//           "order" = $1,
+//           "orderProccess" = $2
+//         WHERE customer_id = $3
+//         `,
+//         [
+//           JSON.stringify(updatedOrders),
+//           JSON.stringify(updatedOrderProccess),
+//           customerId
+//         ]
+//       );
+
+//     } else {
+//         await pool.query(
+//           `
+//           UPDATE guest
+//           SET
+//             "order" = $1,
+//             "orderProccess" = $2
+//           WHERE guestid = $3
+//           `,
+//           [
+//             JSON.stringify(updatedOrders),
+//             JSON.stringify(updatedOrderProccess),
+//             customerId
+//           ]
+//         );
+
+//     }
+
+
+//     const checkUpdatedOrders =
 //         ordersArray.filter(
 //           order =>
 //             Number(order.id) !== Number(orderId)
 //         );
 
-//       await pool.query(
+//       const checkUpdatedOrderProccess =
+//         orderProccessArray.filter(
+//           order =>
+//             Number(order.id) !== Number(orderId)
+//         );
+
+//       const checkUpdatedDelivered =
+//         orderDeliveredArray.filter(
+//           order =>
+//             Number(order.id) !== Number(orderId)
+//         );
+
+
+//     await pool.query(
 //         `
-//         UPDATE customers
-//         SET "order" = $1
-//         WHERE customer_id = $2
+//         UPDATE guest
+//         SET
+//           "order" = $1,
+//           "orderProccess" = $2,
+//           delivered = $3
+//         WHERE guestid = $4
 //         `,
 //         [
-//           JSON.stringify(updatedOrders),
+//           JSON.stringify(checkUpdatedOrders),
+//           JSON.stringify(checkUpdatedOrderProccess),
+//           JSON.stringify(checkUpdatedDelivered),
 //           customerId
 //         ]
 //       );
 
-//       await pool.query(
-//         `
-//         DELETE FROM orders
-//         WHERE id = $1
-//         `,
-//         [orderId]
-//       );
+//     const shouldDeleteGuest =
+//         checkUpdatedOrders.length === 0 &&
+//         checkUpdatedOrderProccess.length === 0 &&
+//         checkUpdatedDelivered.length === 0;
 
-//       return res.status(200).json({
-//         success: true,
-//         message: "Order removed successfully"
-//       });
 
-//     } catch (error) {
+//     // Delete from orders table
+//     await pool.query(
+//       `
+//       DELETE FROM guest_orders
+//       WHERE id = $1
+//       `,
+//       [orderId]
+//     );
 
-//       console.error(error);
+//      // Delete from guest id table
+//      if (shouldDeleteGuest) {
 
-//       return res.status(500).json({
-//         success: false,
-//         message: error.message
-//       });
+//         await pool.query(
+//           `
+//           DELETE FROM guest
+//           WHERE guestid = $1
+//           `,
+//           [customerId]
+//         );
 
-//     }
-//   };
+//       }
 
-export const deleteInOrderAndUser = async (req, res) => {
-  const { customerId, orderId } = req.params;
+//     return res.status(200).json({
+//       success: true,
+//       table: tableName,
+//       message: "Order removed successfully Completed"
+//     });
 
-  try {
+//   } catch (error) {
 
-    let tableName = "customers";
+//     console.error(error);
 
-    let result = await pool.query(
-      `
-      SELECT "order"
-      FROM customers
-      WHERE customer_id = $1
-      `,
-      [customerId]
-    );
+//     return res.status(500).json({
+//       success: false,
+//       message: error.message
+//     });
 
-    // If not found in customers, try guest
-    if (!result.rows.length) {
+//   }
+// };
 
-      tableName = "guest";
+    export const deleteInOrderAndUser = async (req, res) => {
+      const { customerId, orderId } = req.params;
 
-      result = await pool.query(
-        `
-        SELECT "order"
-        FROM guest
-        WHERE guestid = $1
-        `,
-        [customerId]
-      );
-    }
+      try {
 
-    if (!result.rows.length) {
-      return res.status(404).json({
-        success: false,
-        message: "Customer/Guest not found"
-      });
-    }
+        let tableName = "customers";
 
-    const ordersArray =
-      result.rows[0].order || [];
-
-    const orderProccessArray =
-      result.rows[0].orderProccess || [];
-
-    const updatedOrders =
-      ordersArray.filter(
-        order =>
-          Number(order.id) !== Number(orderId)
-      );
-
-    const updatedOrderProccess =
-      orderProccessArray.filter(
-        order =>
-          Number(order.id) !== Number(orderId)
-      );
-
-    // Update correct table
-    if (tableName === "customers") {
-
-      await pool.query(
-        `
-        UPDATE customers
-        SET
-          "order" = $1,
-          "orderProccess" = $2
-        WHERE customer_id = $3
-        `,
-        [
-          JSON.stringify(updatedOrders),
-          JSON.stringify(updatedOrderProccess),
-          customerId
-        ]
-      );
-
-    } else {
-        await pool.query(
+        let result = await pool.query(
           `
-          UPDATE guest
-          SET
-            "order" = $1,
-            "orderProccess" = $2
-          WHERE guestid = $3
+          SELECT
+            "order",
+            "orderProccess",
+            delivered
+          FROM customers
+          WHERE customer_id = $1
           `,
-          [
-            JSON.stringify(updatedOrders),
-            JSON.stringify(updatedOrderProccess),
-            customerId
-          ]
+          [customerId]
         );
 
-    }
+        // If not found in customers, try guest
+        if (!result.rows.length) {
 
-    // Delete from orders table
-    await pool.query(
-      `
-      DELETE FROM guest_orders
-      WHERE id = $1
-      `,
-      [orderId]
-    );
+          tableName = "guest";
 
-     // Delete from guest id table
-      await pool.query(
-        `
-        DELETE FROM guest
-        WHERE guestid = $1
-        `,
-        [orderId]
-      );
+          result = await pool.query(
+            `
+            SELECT
+              "order",
+              "orderProccess",
+              delivered
+            FROM guest
+            WHERE guestid = $1
+            `,
+            [customerId]
+          );
+        }
 
-    return res.status(200).json({
-      success: true,
-      table: tableName,
-      message: "Order removed successfully Completed"
-    });
+        if (!result.rows.length) {
+          return res.status(404).json({
+            success: false,
+            message: "Customer/Guest not found"
+          });
+        }
 
-  } catch (error) {
+        const ordersArray =
+          result.rows[0].order || [];
 
-    console.error(error);
+        const orderProccessArray =
+          result.rows[0].orderProccess || [];
 
-    return res.status(500).json({
-      success: false,
-      message: error.message
-    });
+        const deliveredArray =
+          result.rows[0].delivered || [];
 
-  }
-};
+        const updatedOrders =
+          ordersArray.filter(
+            order =>
+              String(order.id) !== String(orderId)
+          );
 
+        const updatedOrderProccess =
+          orderProccessArray.filter(
+            order =>
+              String(order.id) !== String(orderId)
+          );
+
+        const updatedDelivered =
+          deliveredArray.filter(
+            order =>
+              String(order.id) !== String(orderId)
+          );
+
+        // ==========================
+        // CUSTOMERS
+        // ==========================
+
+        if (tableName === "customers") {
+
+          await pool.query(
+            `
+            UPDATE customers
+            SET
+              "order" = $1,
+              "orderProccess" = $2,
+              delivered = $3
+            WHERE customer_id = $4
+            `,
+            [
+              JSON.stringify(updatedOrders),
+              JSON.stringify(updatedOrderProccess),
+              JSON.stringify(updatedDelivered),
+              customerId
+            ]
+          );
+
+          await pool.query(
+            `
+            DELETE FROM orders
+            WHERE id = $1
+            `,
+            [orderId]
+          );
+        }
+
+        // ==========================
+        // GUESTS
+        // ==========================
+
+        else {
+
+          await pool.query(
+            `
+            UPDATE guest
+            SET
+              "order" = $1,
+              "orderProccess" = $2,
+              delivered = $3
+            WHERE guestid = $4
+            `,
+            [
+              JSON.stringify(updatedOrders),
+              JSON.stringify(updatedOrderProccess),
+              JSON.stringify(updatedDelivered),
+              customerId
+            ]
+          );
+
+          await pool.query(
+            `
+            DELETE FROM guest_orders
+            WHERE id = $1
+            `,
+            [orderId]
+          );
+
+          const shouldDeleteGuest =
+            updatedOrders.length === 0 &&
+            updatedOrderProccess.length === 0 &&
+            updatedDelivered.length === 0;
+
+          if (shouldDeleteGuest) {
+
+            await pool.query(
+              `
+              DELETE FROM guest
+              WHERE guestid = $1
+              `,
+              [customerId]
+            );
+
+            console.log(
+              `Guest ${customerId} deleted because no orders remain`
+            );
+          }
+        }
+
+        return res.status(200).json({
+          success: true,
+          table: tableName,
+          message: "Order removed successfully"
+        });
+
+      } catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+          success: false,
+          message: error.message
+        });
+
+      }
+    };
 /* =========================================
    DELETE ORDER
 ========================================= */
