@@ -1,6 +1,6 @@
 import express from "express";
 import { createOrder, getAllOrders, updateOrder,
-    getOrderById, deleteOrder
+    getOrderById, deleteOrder, deleteInOrderAndUser
  } from "../controllers/order.controller.js";
 import { protect } from "../middleware/auth.middleware.js";
 
@@ -10,7 +10,7 @@ const router = express.Router();
 // router.get("/ordersQR", getOrders)
 router.delete(
   "/:customerId/orders/:orderId",
-  deleteOrder
+  deleteInOrderAndUser
 );
 
 router.post("/create", createOrder);

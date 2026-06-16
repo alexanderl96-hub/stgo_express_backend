@@ -501,78 +501,78 @@ export const deleteInOrderAndUser = async (req, res) => {
 
   try {
 
-    // let tableName = "customers";
+    let tableName = "customers";
 
-    // let result = await pool.query(
-    //   `
-    //   SELECT "order"
-    //   FROM customers
-    //   WHERE customer_id = $1
-    //   `,
-    //   [customerId]
-    // );
+    let result = await pool.query(
+      `
+      SELECT "order"
+      FROM customers
+      WHERE customer_id = $1
+      `,
+      [customerId]
+    );
 
     // If not found in customers, try guest
-    // if (!result.rows.length) {
+    if (!result.rows.length) {
 
-    //   tableName = "guest";
+      tableName = "guest";
 
-    //   result = await pool.query(
-    //     `
-    //     SELECT "order"
-    //     FROM guest
-    //     WHERE guestid = $1
-    //     `,
-    //     [customerId]
-    //   );
-    // }
+      result = await pool.query(
+        `
+        SELECT "order"
+        FROM guest
+        WHERE guestid = $1
+        `,
+        [customerId]
+      );
+    }
 
-    // if (!result.rows.length) {
-    //   return res.status(404).json({
-    //     success: false,
-    //     message: "Customer/Guest not found"
-    //   });
-    // }
+    if (!result.rows.length) {
+      return res.status(404).json({
+        success: false,
+        message: "Customer/Guest not found"
+      });
+    }
 
-    // const ordersArray =
-    //   result.rows[0].order || [];
+    const ordersArray =
+      result.rows[0].order || [];
 
-    // const updatedOrders =
-    //   ordersArray.filter(
-    //     order =>
-    //       Number(order.id) !== Number(orderId)
-    //   );
+    const updatedOrders =
+      ordersArray.filter(
+        order =>
+          Number(order.id) !== Number(orderId)
+      );
 
     // Update correct table
-    // if (tableName === "customers") {
+    if (tableName === "customers") {
 
-    //   await pool.query(
-    //     `
-    //     UPDATE customers
-    //     SET "order" = $1
-    //     WHERE customer_id = $2
-    //     `,
-    //     [
-    //       JSON.stringify(updatedOrders),
-    //       customerId
-    //     ]
-    //   );
+      await pool.query(
+        `
+        UPDATE customers
+        SET "order" = $1
+        WHERE customer_id = $2
+        `,
+        [
+          JSON.stringify(updatedOrders),
+          customerId
+        ]
+      );
 
-    // } else {
+    } else {
 
-    //   await pool.query(
-    //     `
-    //     UPDATE guest
-    //     SET "order" = $1
-    //     WHERE guestid = $2
-    //     `,
-    //     [
-    //       JSON.stringify(updatedOrders),
-    //       customerId
-    //     ]
-    //   );
+      await pool.query(
+        `
+        UPDATE guest
+        SET "order" = $1
+        WHERE guestid = $2
+        `,
+        [
+          JSON.stringify(updatedOrders),
+          customerId
+        ]
+      );
 
-    // }
+    }
 
     // Delete from orders table
     await pool.query(
