@@ -22,14 +22,16 @@ router.post(
   createProduct
 );
 
-router.put("/:id", updateProduct);
-
-router.delete("/:id", deleteProduct);
-
 router.put(
   "/restore-inventory",
   restoreProductsInventory
 );
+
+router.put("/:id", updateProduct);
+
+router.delete("/:id", deleteProduct);
+
+
 
 
 export default router;

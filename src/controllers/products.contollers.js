@@ -516,6 +516,8 @@ async (req, res) => {
 
   try {
 
+     console.log("Update INVENTORY CONTROLLER");
+
     const { id } = req.params;
 
     const data = req.body;
@@ -833,6 +835,8 @@ export const deleteProduct = async (req, res) => {
       req,
       res
     ) => {
+
+       console.log("RESTORE INVENTORY CONTROLLER");
 
       const { items } = req.body;
 
