@@ -577,7 +577,7 @@ export const deleteInOrderAndUser = async (req, res) => {
     // Delete from orders table
     await pool.query(
       `
-      DELETE FROM orders
+      DELETE FROM guest_orders
       WHERE id = $1
       `,
       [orderId]
