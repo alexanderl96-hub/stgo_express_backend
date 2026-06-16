@@ -537,8 +537,17 @@ export const deleteInOrderAndUser = async (req, res) => {
     const ordersArray =
       result.rows[0].order || [];
 
+    const orderProccessArray =
+      result.rows[0].orderProccess || [];
+
     const updatedOrders =
       ordersArray.filter(
+        order =>
+          Number(order.id) !== Number(orderId)
+      );
+
+    const updatedOrderProccess =
+      orderProccessArray.filter(
         order =>
           Number(order.id) !== Number(orderId)
       );
@@ -549,28 +558,33 @@ export const deleteInOrderAndUser = async (req, res) => {
       await pool.query(
         `
         UPDATE customers
-        SET "order" = $1
-        WHERE customer_id = $2
+        SET
+          "order" = $1,
+          "orderProccess" = $2
+        WHERE customer_id = $3
         `,
         [
           JSON.stringify(updatedOrders),
+          JSON.stringify(updatedOrderProccess),
           customerId
         ]
       );
 
     } else {
-
-      await pool.query(
-        `
-        UPDATE guest
-        SET "order" = $1
-        WHERE guestid = $2
-        `,
-        [
-          JSON.stringify(updatedOrders),
-          customerId
-        ]
-      );
+        await pool.query(
+          `
+          UPDATE guest
+          SET
+            "order" = $1,
+            "orderProccess" = $2
+          WHERE guestid = $3
+          `,
+          [
+            JSON.stringify(updatedOrders),
+            JSON.stringify(updatedOrderProccess),
+            customerId
+          ]
+        );
 
     }
 
@@ -582,6 +596,15 @@ export const deleteInOrderAndUser = async (req, res) => {
       `,
       [orderId]
     );
+
+     // Delete from guest id table
+      await pool.query(
+        `
+        DELETE FROM guest
+        WHERE guestid = $1
+        `,
+        [orderId]
+      );
 
     return res.status(200).json({
       success: true,
