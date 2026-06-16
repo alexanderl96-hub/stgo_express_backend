@@ -70,7 +70,10 @@ export const createNewGuestUser = ({
   email,
   phone,
   address = "",
-  order = []
+  order = [],
+  orderProccess = [],
+  delivered = []
+
 }) => {
   return {
     guestId,
@@ -79,7 +82,9 @@ export const createNewGuestUser = ({
     phone,
     address,
     user_create: new Date().toLocaleString(),
-    order
+    order,
+    orderProccess,
+    delivered
   };
 };
 

@@ -8,6 +8,10 @@ const router = express.Router();
 
 // router.get("/admin", getOrders);
 // router.get("/ordersQR", getOrders)
+router.delete(
+  "/:customerId/orders/:orderId",
+  deleteOrder
+);
 
 router.post("/create", createOrder);
 

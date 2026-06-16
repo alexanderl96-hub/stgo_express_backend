@@ -429,6 +429,177 @@ export const updateOrder = async (req, res) => {
   }
 };
 
+// export const deleteInOrderAndUser = async (req, res) => {
+//     const { customerId, orderId } = req.params;
+
+//     try {
+
+//       const customerResult = await pool.query(
+//         `
+//         SELECT "order"
+//         FROM customers
+//         WHERE customer_id = $1
+//         `,
+//         [customerId]
+//       );
+
+//       if (!customerResult.rows.length) {
+//         return res.status(404).json({
+//           success: false,
+//           message: "Customer not found"
+//         });
+//       }
+
+//       const ordersArray =
+//         customerResult.rows[0].order || [];
+
+//       const updatedOrders =
+//         ordersArray.filter(
+//           order =>
+//             Number(order.id) !== Number(orderId)
+//         );
+
+//       await pool.query(
+//         `
+//         UPDATE customers
+//         SET "order" = $1
+//         WHERE customer_id = $2
+//         `,
+//         [
+//           JSON.stringify(updatedOrders),
+//           customerId
+//         ]
+//       );
+
+//       await pool.query(
+//         `
+//         DELETE FROM orders
+//         WHERE id = $1
+//         `,
+//         [orderId]
+//       );
+
+//       return res.status(200).json({
+//         success: true,
+//         message: "Order removed successfully"
+//       });
+
+//     } catch (error) {
+
+//       console.error(error);
+
+//       return res.status(500).json({
+//         success: false,
+//         message: error.message
+//       });
+
+//     }
+//   };
+
+export const deleteInOrderAndUser = async (req, res) => {
+  const { customerId, orderId } = req.params;
+
+  try {
+
+    let tableName = "customers";
+
+    let result = await pool.query(
+      `
+      SELECT "order"
+      FROM customers
+      WHERE customer_id = $1
+      `,
+      [customerId]
+    );
+
+    // If not found in customers, try guest
+    if (!result.rows.length) {
+
+      tableName = "guest";
+
+      result = await pool.query(
+        `
+        SELECT "order"
+        FROM guest
+        WHERE guestid = $1
+        `,
+        [customerId]
+      );
+    }
+
+    if (!result.rows.length) {
+      return res.status(404).json({
+        success: false,
+        message: "Customer/Guest not found"
+      });
+    }
+
+    const ordersArray =
+      result.rows[0].order || [];
+
+    const updatedOrders =
+      ordersArray.filter(
+        order =>
+          Number(order.id) !== Number(orderId)
+      );
+
+    // Update correct table
+    if (tableName === "customers") {
+
+      await pool.query(
+        `
+        UPDATE customers
+        SET "order" = $1
+        WHERE customer_id = $2
+        `,
+        [
+          JSON.stringify(updatedOrders),
+          customerId
+        ]
+      );
+
+    } else {
+
+      await pool.query(
+        `
+        UPDATE guest
+        SET "order" = $1
+        WHERE guestid = $2
+        `,
+        [
+          JSON.stringify(updatedOrders),
+          customerId
+        ]
+      );
+
+    }
+
+    // Delete from orders table
+    await pool.query(
+      `
+      DELETE FROM orders
+      WHERE id = $1
+      `,
+      [orderId]
+    );
+
+    return res.status(200).json({
+      success: true,
+      table: tableName,
+      message: "Order removed successfully"
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+
+  }
+};
 
 /* =========================================
    DELETE ORDER
@@ -439,8 +610,6 @@ export const deleteOrder = async (req, res) => {
     try {
 
       const { id } = req.params;
-
-
 
       await pool.query(
         `

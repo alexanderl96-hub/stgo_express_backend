@@ -153,7 +153,8 @@ export const createCustomer = async (req, res) => {
 // CREATE GUEST
 export const createCustomerGuest = async (req, res) => {
   try {
-    const { guestId, name, email, phone, address, order } =
+    const { guestId, name, email, phone, address, order, orderProccess,
+    delivered } =
       req.body;
 
     // REQUIRED FIELDS
@@ -187,7 +188,9 @@ export const createCustomerGuest = async (req, res) => {
       email,
       phone,
       address,
-      order
+      order,
+      orderProccess,
+      delivered
     });
 
     // INSERT INTO DATABASE
@@ -200,11 +203,14 @@ export const createCustomerGuest = async (req, res) => {
         phone,
         address,
         user_create,
-        "order"
+        "order",
+        "orderProccess",
+        "delivered"
       )
       VALUES (
         $1, $2, $3, $4,
-        $5, $6, $7
+        $5, $6, $7, $8,
+        $9
       )
       RETURNING *
       `,
@@ -216,7 +222,9 @@ export const createCustomerGuest = async (req, res) => {
         newUser.address,
         newUser.user_create,
 
-        JSON.stringify(newUser.order)
+        JSON.stringify(newUser.order),
+        JSON.stringify(newUser.orderProccess),
+        JSON.stringify(newUser.delivered)
       ],
     );
 

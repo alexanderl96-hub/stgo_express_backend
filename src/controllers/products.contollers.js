@@ -827,3 +827,151 @@ export const deleteProduct = async (req, res) => {
     }
   };
 
+
+
+  export const restoreProductsInventory = async (
+      req,
+      res
+    ) => {
+
+      const { items } = req.body;
+
+      try {
+
+        if (
+          !Array.isArray(items) ||
+          items.length === 0
+        ) {
+          return res.status(400).json({
+            success: false,
+            message: "No items provided"
+          });
+        }
+
+        const updatedProducts = [];
+
+        for (const item of items) {
+
+          const result = await pool.query(
+            `
+            SELECT *
+            FROM products
+            WHERE id = $1
+            `,
+            [item.product_id]
+          );
+
+          if (!result.rows.length) {
+            continue;
+          }
+
+          const product =
+            result.rows[0];
+
+          const qty =
+            Number(item.qty) || 0;
+
+          const stock =
+            Number(product.stock) +
+            qty;
+
+          const total_items =
+            Number(product.total_items) +
+            qty;
+
+          const sold =
+            Math.max(
+              0,
+              Number(product.sold) - qty
+            );
+
+          let colors_match =
+            product.colors_match || {};
+
+          // ==========================
+          // UPDATE COLORS_MATCH
+          // ==========================
+
+          if (
+            item.colors &&
+            colors_match[item.colors]
+          ) {
+
+            colors_match[item.colors].qty +=
+              qty;
+
+            colors_match[
+              item.colors
+            ].matching_sizes =
+              colors_match[
+                item.colors
+              ].matching_sizes.map(
+                ([size, currentQty]) => {
+
+                  if (
+                    String(size) ===
+                    String(item.sizes)
+                  ) {
+                    return [
+                      size,
+                      currentQty + qty
+                    ];
+                  }
+
+                  return [
+                    size,
+                    currentQty
+                  ];
+                }
+              );
+          }
+
+          await pool.query(
+            `
+            UPDATE products
+            SET
+              stock = $1,
+              total_items = $2,
+              sold = $3,
+              colors_match = $4
+            WHERE id = $5
+            `,
+            [
+              stock,
+              total_items,
+              sold,
+              JSON.stringify(
+                colors_match
+              ),
+              item.product_id
+            ]
+          );
+
+          updatedProducts.push({
+            product_id:
+              item.product_id,
+            stock,
+            total_items,
+            sold
+          });
+        }
+
+        return res.status(200).json({
+          success: true,
+          message:
+            "Inventory restored successfully",
+          products:
+            updatedProducts
+        });
+
+      } catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+          success: false,
+          message: error.message
+        });
+
+      }
+    };
