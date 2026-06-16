@@ -586,7 +586,7 @@ export const deleteInOrderAndUser = async (req, res) => {
     return res.status(200).json({
       success: true,
       table: tableName,
-      message: "Order removed successfully"
+      message: "Order removed successfully Completed"
     });
 
   } catch (error) {
