@@ -966,6 +966,8 @@ export const deleteProduct = async (req, res) => {
 
       } catch (error) {
 
+          console.error("restoreProductsInventory:", error);
+
         console.error(error);
 
         return res.status(500).json({
