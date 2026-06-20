@@ -4,7 +4,9 @@ import {   createProduct,
   getProductById,
   updateProduct,
   deleteProduct,
-  restoreProductsInventory
+  restoreProductsInventory,
+  addReview,
+  updateWishlist
  } from "../controllers/products.contollers.js";
 import { protect } from "../middleware/auth.middleware.js";
 import upload from "../config/multer.js";
@@ -22,13 +24,13 @@ router.post(
   createProduct
 );
 
+router.put("/restore-inventory", restoreProductsInventory);
+router.put("/:productId/review", addReview);
 router.put(
-  "/restore-inventory",
-  restoreProductsInventory
+  "/:productId/wishlist",
+  updateWishlist
 );
-
 router.put("/:id", updateProduct);
-
 router.delete("/:id", deleteProduct);
 
 

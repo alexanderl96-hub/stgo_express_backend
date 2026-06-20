@@ -511,280 +511,414 @@ export const getProductById = async (req, res) => {
 /* =========================================
    UPDATE PRODUCT
 ========================================= */
-export const updateProduct =
-async (req, res) => {
+  export const updateProduct =
+    async (req, res) => {
 
-  try {
+      try {
 
-     console.log("Update INVENTORY CONTROLLER");
+        console.log("Update INVENTORY CONTROLLER");
 
-    const { id } = req.params;
+        const { id } = req.params;
 
-    const data = req.body;
+        const data = req.body;
 
 
 
-    // CONVERT EMPTY STRINGS
-    // TO NULL
-    Object.keys(data).forEach(key => {
+        // CONVERT EMPTY STRINGS
+        // TO NULL
+        Object.keys(data).forEach(key => {
 
-      if (data[key] === "") {
+          if (data[key] === "") {
 
-        data[key] = null;
+            data[key] = null;
+          }
+        });
+
+    if (data.sizes) {
+      data.sizes =
+        typeof data.sizes === "string"
+          ? data.sizes
+          : JSON.stringify(data.sizes);
+    }
+
+    if (data.colors_match) {
+      data.colors_match =
+        typeof data.colors_match === "string"
+          ? data.colors_match
+          : JSON.stringify(data.colors_match);
+    }
+
+    if (data.battery_details) {
+      data.battery_details =
+        typeof data.battery_details === "string"
+          ? data.battery_details
+          : JSON.stringify(data.battery_details);
+    }
+
+        const result =
+          await pool.query(
+
+            `
+            UPDATE products
+
+            SET
+
+              name =
+                COALESCE($1, name),
+
+              description =
+                COALESCE($2, description),
+
+              price =
+                COALESCE($3, price),
+
+              stock =
+                COALESCE($4, stock),
+
+              discount =
+                COALESCE($5, discount),
+
+              rating =
+                COALESCE($6, rating),
+
+              reviews =
+                COALESCE($7, reviews),
+
+              sold =
+                COALESCE($8, sold),
+
+              dollar_price =
+                COALESCE($9, dollar_price),
+
+              current_dollar_price =
+                COALESCE($10, current_dollar_price),
+
+              original_price =
+                COALESCE($11, original_price),
+
+              category =
+                COALESCE($12, category),
+
+              sub_category =
+                COALESCE($13, sub_category),
+
+              brand =
+                COALESCE($14, brand),
+
+              gender =
+                COALESCE($15, gender),
+
+              age_group =
+                COALESCE($16, age_group),
+
+              colors =
+                COALESCE($17, colors),
+
+              sizes =
+                COALESCE($18, sizes),
+
+              material =
+                COALESCE($19, material),
+
+              img =
+                COALESCE($20, img),
+
+              total_items =
+                COALESCE($21, total_items),
+
+              featured =
+                COALESCE($22, featured),
+
+              store =
+                COALESCE($23, store),
+
+              status =
+                COALESCE($24, status),
+
+              likes =
+                COALESCE($25, likes),
+
+              date =
+                COALESCE($26, date),
+
+              caracteristics =
+                COALESCE($27, caracteristics),
+
+              recommended =
+                COALESCE($28, recommended),
+
+              battery_details =
+                COALESCE($29, battery_details),
+
+              modelo =
+                COALESCE($30, modelo),
+
+              original_store_price =
+                COALESCE($31, original_store_price),
+
+              colors_match =
+                COALESCE($32, colors_match),
+
+              qrcode =
+                COALESCE($33, qrcode)
+
+            WHERE id = $34
+
+            RETURNING *
+            `,
+
+            [
+
+              data.name,
+
+              data.description,
+
+              data.price,
+
+              data.stock,
+
+              data.discount,
+
+              data.rating,
+
+              data.reviews,
+
+              data.sold,
+
+              data.dollar_price,
+
+              data.current_dollar_price,
+
+              data.original_price,
+
+              data.category,
+
+              data.sub_category,
+
+              data.brand,
+
+              data.gender,
+
+              data.age_group,
+
+              data.colors,
+
+              data.sizes,
+
+              data.material,
+
+              data.img,
+
+              data.total_items,
+
+              data.featured,
+
+              data.store,
+
+              data.status,
+
+              data.likes,
+
+              data.date,
+
+              data.caracteristics,
+
+              data.recommended,
+
+              data.battery_details,
+
+              data.modelo,
+
+              data.original_store_price,
+
+              data.colors_match,
+
+              data.qrCode,
+
+              id
+            ]
+          );
+
+
+
+        // PRODUCT NOT FOUND
+        if (
+          result.rows.length === 0
+        ) {
+
+          return res.status(404).json({
+
+            success: false,
+
+            message:
+              "Product not found"
+          });
+        }
+
+
+
+        return res.status(200).json({
+
+          success: true,
+
+          product:
+            result.rows[0]
+        });
+
+
+
+      } catch (error) {
+
+        console.log("MESSAGE:", error.message);
+      console.log("DETAIL:", error.detail);
+      console.log("WHERE:", error.where);
+      console.log(error);
+
+        console.log(error);
+
+        return res.status(500).json({
+
+          success: false,
+
+          error:
+            error.message
+        });
       }
-    });
+    };
 
-if (data.sizes) {
-  data.sizes =
-    typeof data.sizes === "string"
-      ? data.sizes
-      : JSON.stringify(data.sizes);
-}
+  
+  export const updateWishlist =
+  async (req, res) => {
 
-if (data.colors_match) {
-  data.colors_match =
-    typeof data.colors_match === "string"
-      ? data.colors_match
-      : JSON.stringify(data.colors_match);
-}
+    const { productId } =
+      req.params;
 
-if (data.battery_details) {
-  data.battery_details =
-    typeof data.battery_details === "string"
-      ? data.battery_details
-      : JSON.stringify(data.battery_details);
-}
+    const {
+      customer_id
+    } = req.body;
 
-    const result =
-      await pool.query(
+    try {
 
-        `
-        UPDATE products
+      const result =
+        await pool.query(
+          `
+          SELECT *
+          FROM products
+          WHERE id = $1
+          `,
+          [productId]
+        );
 
-        SET
+      if (!result.rows.length) {
 
-          name =
-            COALESCE($1, name),
+        return res
+          .status(404)
+          .json({
+            success: false,
+            message:
+              "Product not found"
+          });
+      }
 
-          description =
-            COALESCE($2, description),
+      const product =
+        result.rows[0];
 
-          price =
-            COALESCE($3, price),
+      console.log("BEFORE:", {
+        likes: product.likes,
+        likes_data: product.likes_data
+      });
 
-          stock =
-            COALESCE($4, stock),
+      let likesData =
+        product.likes_data || [];
 
-          discount =
-            COALESCE($5, discount),
+      let likes =
+        Number(product.likes) || 0;
 
-          rating =
-            COALESCE($6, rating),
+      let liked = true;
 
-          reviews =
-            COALESCE($7, reviews),
+      // CUSTOMER
+      if (customer_id) {
 
-          sold =
-            COALESCE($8, sold),
+        const alreadyLiked =
+          likesData.some(
+            id =>
+              Number(id) ===
+              Number(customer_id)
+          );
 
-          dollar_price =
-            COALESCE($9, dollar_price),
+        if (alreadyLiked) {
 
-          current_dollar_price =
-            COALESCE($10, current_dollar_price),
-
-          original_price =
-            COALESCE($11, original_price),
-
-          category =
-            COALESCE($12, category),
-
-          sub_category =
-            COALESCE($13, sub_category),
-
-          brand =
-            COALESCE($14, brand),
-
-          gender =
-            COALESCE($15, gender),
-
-          age_group =
-            COALESCE($16, age_group),
-
-          colors =
-            COALESCE($17, colors),
-
-          sizes =
-            COALESCE($18, sizes),
-
-          material =
-            COALESCE($19, material),
-
-          img =
-            COALESCE($20, img),
-
-          total_items =
-            COALESCE($21, total_items),
-
-          featured =
-            COALESCE($22, featured),
-
-          store =
-            COALESCE($23, store),
-
-          status =
-            COALESCE($24, status),
+          likesData =
+            likesData.filter(
+              id =>
+                Number(id) !==
+                Number(customer_id)
+            );
 
           likes =
-            COALESCE($25, likes),
+            Math.max(
+              0,
+              likes - 1
+            );
 
-          date =
-            COALESCE($26, date),
+          liked = false;
 
-          caracteristics =
-            COALESCE($27, caracteristics),
+        } else {
 
-          recommended =
-            COALESCE($28, recommended),
+          likesData.push(
+            customer_id
+          );
 
-          battery_details =
-            COALESCE($29, battery_details),
+          likes += 1;
 
-          modelo =
-            COALESCE($30, modelo),
+          liked = true;
+        }
 
-          original_store_price =
-            COALESCE($31, original_store_price),
+      }
+      // GUEST
+      else {
 
-          colors_match =
-            COALESCE($32, colors_match),
+        likes += 1;
 
-          qrcode =
-            COALESCE($33, qrcode)
+        liked = true;
+      }
 
-        WHERE id = $34
-
-        RETURNING *
+      await pool.query(
+        `
+        UPDATE products
+        SET
+          likes = $1,
+          likes_data = $2
+        WHERE id = $3
         `,
-
         [
-
-          data.name,
-
-          data.description,
-
-          data.price,
-
-          data.stock,
-
-          data.discount,
-
-          data.rating,
-
-          data.reviews,
-
-          data.sold,
-
-          data.dollar_price,
-
-          data.current_dollar_price,
-
-          data.original_price,
-
-          data.category,
-
-          data.sub_category,
-
-          data.brand,
-
-          data.gender,
-
-          data.age_group,
-
-          data.colors,
-
-          data.sizes,
-
-          data.material,
-
-          data.img,
-
-          data.total_items,
-
-          data.featured,
-
-          data.store,
-
-          data.status,
-
-          data.likes,
-
-          data.date,
-
-          data.caracteristics,
-
-          data.recommended,
-
-          data.battery_details,
-
-          data.modelo,
-
-          data.original_store_price,
-
-          data.colors_match,
-
-          data.qrCode,
-
-          id
+          likes,
+          JSON.stringify(
+            likesData
+          ),
+          productId
         ]
       );
 
-
-
-    // PRODUCT NOT FOUND
-    if (
-      result.rows.length === 0
-    ) {
-
-      return res.status(404).json({
-
-        success: false,
-
-        message:
-          "Product not found"
+      res.json({
+        success: true,
+        liked,
+        likes
       });
+
+    } catch (error) {
+
+      console.error(error);
+
+      res
+        .status(500)
+        .json({
+          success: false,
+          message:
+            error.message
+        });
     }
-
-
-
-    return res.status(200).json({
-
-      success: true,
-
-      product:
-        result.rows[0]
-    });
-
-
-
-  } catch (error) {
-
-    console.log("MESSAGE:", error.message);
-  console.log("DETAIL:", error.detail);
-  console.log("WHERE:", error.where);
-  console.log(error);
-
-    console.log(error);
-
-    return res.status(500).json({
-
-      success: false,
-
-      error:
-        error.message
-    });
-  }
-};
+  };
 
 
 /* =========================================
@@ -981,3 +1115,155 @@ export const deleteProduct = async (req, res) => {
 
       }
     };
+
+
+  export const addReview = async (
+    req,
+    res
+  ) => {
+
+    const { productId } =
+      req.params;
+
+    const review =
+      req.body;
+
+    try {
+
+      const result =
+        await pool.query(
+          `
+          SELECT *
+          FROM products
+          WHERE id = $1
+          `,
+          [productId]
+        );
+
+      if (!result.rows.length) {
+
+        return res
+          .status(404)
+          .json({
+            success: false,
+            message:
+              "Product not found"
+          });
+      }
+
+      const product =
+        result.rows[0];
+
+      const reviewsData =
+        product.reviews_data || [];
+
+      const newReview = {
+
+        id: Date.now(),
+
+        customer_id:
+          review.customer_id,
+
+        name:
+          review.name,
+
+        rating:
+          Number(review.rating),
+
+        title:
+          review.title,
+
+        comment:
+          review.comment,
+
+        verified_purchase:
+          true,
+
+        date:
+          new Date().toISOString()
+      };
+
+      // Add new review
+      const updatedReviews = [
+        ...reviewsData,
+        newReview
+      ];
+
+      // Average rating from ALL reviews
+      const averageRating =
+        updatedReviews.reduce(
+          (sum, item) =>
+            sum +
+            Number(item.rating || 0),
+          0
+        ) /
+        updatedReviews.length;
+
+      // Count UNIQUE customers
+      const uniqueCustomers =
+        [
+          ...new Set(
+            updatedReviews.map(
+              item =>
+                item.customer_id
+            )
+          )
+        ];
+
+      const reviewCount =
+        uniqueCustomers.length;
+
+      await pool.query(
+        `
+        UPDATE products
+        SET
+          rating = $1,
+          reviews = $2,
+          reviews_data = $3
+        WHERE id = $4
+        `,
+        [
+          Number(
+            averageRating.toFixed(1)
+          ),
+
+          reviewCount,
+
+          JSON.stringify(
+            updatedReviews
+          ),
+
+          productId
+        ]
+      );
+
+      res.json({
+        success: true,
+        message:
+          "Review added",
+
+        rating:
+          Number(
+            averageRating.toFixed(1)
+          ),
+
+        reviews:
+          reviewCount,
+
+        reviews_data:
+          updatedReviews
+      });
+
+    } catch (error) {
+
+      console.error(error);
+
+      res
+        .status(500)
+        .json({
+          success: false,
+          message:
+            error.message
+        });
+    }
+  };
