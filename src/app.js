@@ -12,6 +12,7 @@ import passwordRoutes from "./routes/password.routes.js";
 import productImagesRoutes from "./routes/productImages.routes.js";
 import qrcode from "./routes/productQRCode.routes.js"
 import guestOrdersRoutes from "./routes/guestOrders.routes.js";
+import enviosCompleteRoutes from "./routes/enviosComplete.routes.js";
 
 
 import path from "path";
@@ -87,6 +88,8 @@ app.use("/api/auth", passwordRoutes);
 app.use("/api/product-images", productImagesRoutes);
 
 app.use("/api/guest-orders", guestOrdersRoutes);
+
+app.use("/api/envios-complete", enviosCompleteRoutes);
 
 
 
