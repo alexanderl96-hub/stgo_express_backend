@@ -535,11 +535,30 @@ export const getProductById = async (req, res) => {
         });
 
     if (data.sizes) {
-      data.sizes =
-        typeof data.sizes === "string"
-          ? data.sizes
-          : JSON.stringify(data.sizes);
+
+      if (typeof data.sizes === "string") {
+
+        data.sizes = JSON.stringify(
+          data.sizes
+            .split(",")
+            .map(size => size.trim())
+            .filter(Boolean)
+        );
+
+      } else {
+
+        data.sizes =
+          JSON.stringify(data.sizes);
+
+      }
     }
+
+    if (data.colors) {
+        data.colors =
+          typeof data.colors === "string"
+            ? data.colors
+            : JSON.stringify(data.colors);
+      }
 
     if (data.colors_match) {
       data.colors_match =
@@ -554,6 +573,13 @@ export const getProductById = async (req, res) => {
           ? data.battery_details
           : JSON.stringify(data.battery_details);
     }
+
+    console.log({
+  colors: data.colors,
+  sizes: data.sizes,
+  colors_match: data.colors_match,
+  featured: data.featured
+});
 
         const result =
           await pool.query(
