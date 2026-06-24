@@ -965,12 +965,165 @@ export const deleteProduct = async (req, res) => {
 
 
 
+  // export const restoreProductsInventory = async (
+  //     req,
+  //     res
+  //   ) => {
+
+  //      console.log("RESTORE INVENTORY CONTROLLER");
+
+  //     const { items } = req.body;
+
+  //     try {
+
+  //       if (
+  //         !Array.isArray(items) ||
+  //         items.length === 0
+  //       ) {
+  //         return res.status(400).json({
+  //           success: false,
+  //           message: "No items provided"
+  //         });
+  //       }
+
+  //       const updatedProducts = [];
+
+  //       for (const item of items) {
+
+  //         const result = await pool.query(
+  //           `
+  //           SELECT *
+  //           FROM products
+  //           WHERE id = $1
+  //           `,
+  //           [item.product_id]
+  //         );
+
+  //         if (!result.rows.length) {
+  //           continue;
+  //         }
+
+  //         const product =
+  //           result.rows[0];
+
+  //         const qty =
+  //           Number(item.qty) || 0;
+
+  //         const stock =
+  //           Number(product.stock) +
+  //           qty;
+
+  //         const total_items =
+  //           Number(product.total_items) +
+  //           qty;
+
+  //         const sold =
+  //           Math.max(
+  //             0,
+  //             Number(product.sold) - qty
+  //           );
+
+  //         let colors_match =
+  //           product.colors_match || {};
+
+  //         // ==========================
+  //         // UPDATE COLORS_MATCH
+  //         // ==========================
+
+  //         if (
+  //           item.colors &&
+  //           colors_match[item.colors]
+  //         ) {
+
+  //           colors_match[item.colors].qty +=
+  //             qty;
+
+  //           colors_match[
+  //             item.colors
+  //           ].matching_sizes =
+  //             colors_match[
+  //               item.colors
+  //             ].matching_sizes.map(
+  //               ([size, currentQty]) => {
+
+  //                 if (
+  //                   String(size) ===
+  //                   String(item.sizes)
+  //                 ) {
+  //                   return [
+  //                     size,
+  //                     currentQty + qty
+  //                   ];
+  //                 }
+
+  //                 return [
+  //                   size,
+  //                   currentQty
+  //                 ];
+  //               }
+  //             );
+  //         }
+
+  //         await pool.query(
+  //           `
+  //           UPDATE products
+  //           SET
+  //             stock = $1,
+  //             total_items = $2,
+  //             sold = $3,
+  //             colors_match = $4
+  //           WHERE id = $5
+  //           `,
+  //           [
+  //             stock,
+  //             total_items,
+  //             sold,
+  //             JSON.stringify(
+  //               colors_match
+  //             ),
+  //             item.product_id
+  //           ]
+  //         );
+
+  //         updatedProducts.push({
+  //           product_id:
+  //             item.product_id,
+  //           stock,
+  //           total_items,
+  //           sold
+  //         });
+  //       }
+
+  //       return res.status(200).json({
+  //         success: true,
+  //         message:
+  //           "Inventory restored successfully",
+  //         products:
+  //           updatedProducts
+  //       });
+
+  //     } catch (error) {
+
+  //         console.error("restoreProductsInventory:", error);
+
+  //       console.error(error);
+
+  //       return res.status(500).json({
+  //         success: false,
+  //         message: error.message
+  //       });
+
+  //     }
+  //   };
+
   export const restoreProductsInventory = async (
       req,
       res
     ) => {
 
-       console.log("RESTORE INVENTORY CONTROLLER");
+      console.log(
+        "RESTORE INVENTORY CONTROLLER"
+      );
 
       const { items } = req.body;
 
@@ -990,14 +1143,15 @@ export const deleteProduct = async (req, res) => {
 
         for (const item of items) {
 
-          const result = await pool.query(
-            `
-            SELECT *
-            FROM products
-            WHERE id = $1
-            `,
-            [item.product_id]
-          );
+          const result =
+            await pool.query(
+              `
+              SELECT *
+              FROM products
+              WHERE id = $1
+              `,
+              [item.product_id]
+            );
 
           if (!result.rows.length) {
             continue;
@@ -1010,24 +1164,26 @@ export const deleteProduct = async (req, res) => {
             Number(item.qty) || 0;
 
           const stock =
-            Number(product.stock) +
+            Number(product.stock || 0) +
             qty;
 
           const total_items =
-            Number(product.total_items) +
-            qty;
+            Number(
+              product.total_items || 0
+            ) + qty;
 
           const sold =
             Math.max(
               0,
-              Number(product.sold) - qty
+              Number(product.sold || 0) -
+                qty
             );
 
           let colors_match =
             product.colors_match || {};
 
           // ==========================
-          // UPDATE COLORS_MATCH
+          // RESTORE COLORS_MATCH
           // ==========================
 
           if (
@@ -1035,34 +1191,72 @@ export const deleteProduct = async (req, res) => {
             colors_match[item.colors]
           ) {
 
-            colors_match[item.colors].qty +=
-              qty;
+            const colorData =
+              colors_match[item.colors];
 
-            colors_match[
-              item.colors
-            ].matching_sizes =
-              colors_match[
-                item.colors
-              ].matching_sizes.map(
-                ([size, currentQty]) => {
+            // Restore color qty
+            colorData.qty =
+              Number(
+                colorData.qty || 0
+              ) + qty;
 
-                  if (
-                    String(size) ===
-                    String(item.sizes)
-                  ) {
-                    return [
-                      size,
-                      currentQty + qty
-                    ];
-                  }
+            if (
+              !Array.isArray(
+                colorData.matching_sizes
+              )
+            ) {
+              colorData.matching_sizes =
+                [];
+            }
 
-                  return [
-                    size,
-                    currentQty
-                  ];
-                }
+            const sizeIndex =
+              colorData.matching_sizes.findIndex(
+                ([size]) =>
+                  String(size) ===
+                  String(item.sizes)
               );
+
+            if (sizeIndex >= 0) {
+
+              // Size already exists
+              colorData.matching_sizes[
+                sizeIndex
+              ][1] =
+                Number(
+                  colorData.matching_sizes[
+                    sizeIndex
+                  ][1]
+                ) + qty;
+
+            } else {
+
+              // Size was removed when stock hit 0
+              colorData.matching_sizes.push([
+                item.sizes,
+                qty
+              ]);
+            }
           }
+
+          // ==========================
+          // REBUILD SIZES ARRAY
+          // ==========================
+
+          const sizes = [
+            ...new Set(
+              Object.values(
+                colors_match
+              ).flatMap(
+                color =>
+                  (
+                    color.matching_sizes ||
+                    []
+                  ).map(
+                    ([size]) => size
+                  )
+              )
+            )
+          ];
 
           await pool.query(
             `
@@ -1071,13 +1265,15 @@ export const deleteProduct = async (req, res) => {
               stock = $1,
               total_items = $2,
               sold = $3,
-              colors_match = $4
-            WHERE id = $5
+              sizes = $4,
+              colors_match = $5
+            WHERE id = $6
             `,
             [
               stock,
               total_items,
               sold,
+              JSON.stringify(sizes),
               JSON.stringify(
                 colors_match
               ),
@@ -1090,7 +1286,9 @@ export const deleteProduct = async (req, res) => {
               item.product_id,
             stock,
             total_items,
-            sold
+            sold,
+            sizes,
+            colors_match
           });
         }
 
@@ -1104,9 +1302,10 @@ export const deleteProduct = async (req, res) => {
 
       } catch (error) {
 
-          console.error("restoreProductsInventory:", error);
-
-        console.error(error);
+        console.error(
+          "restoreProductsInventory:",
+          error
+        );
 
         return res.status(500).json({
           success: false,
