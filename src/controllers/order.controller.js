@@ -4,14 +4,106 @@ import {
   createNewOrder
 } from "../utils/factories.js";
 
+import { sendOrderEmail } from "../services/email.service.js";
+
 
 
 /* =========================================
    CREATE ORDER
 ========================================= */
+// export const createOrder = async (req, res) => {
+//   try {
+
+//     const {
+//       id,
+//       qrcode,
+//       adm_in_charge,
+//       gestor_sell,
+//       orders,
+//       dollar_price,
+//       cup_price,
+//       revenew_total,
+//       seller_cash,
+//       tienda,
+//       guest_name,
+//       guest_email,
+//       phone,
+//       payment_format,
+//       payment_option,
+//       status_sell
+//     } = req.body;
+
+//     console.log(req.body)
+
+//     const result = await pool.query(
+//       `
+//       INSERT INTO guest_orders (
+//         id,
+//         qrcode,
+//         adm_in_charge,
+//         gestor_sell,
+//         orders,
+//         dollar_price,
+//         cup_price,
+//         revenew_total,
+//         seller_cash,
+//         tienda,
+//         guest_name,
+//         guest_email,
+//         phone,
+//         payment_format,
+//         payment_option,
+//         status_sell
+//       )
+//       VALUES (
+//         $1,$2,$3,$4,
+//         $5,$6,$7,$8,
+//         $9,$10,$11,$12,
+//         $13,$14,$15,$16
+//       )
+//       RETURNING *
+//       `,
+//       [
+//         id,
+//         qrcode,
+//         adm_in_charge,
+//         gestor_sell,
+//         JSON.stringify(orders),
+//         dollar_price,
+//         cup_price,
+//         revenew_total,
+//         seller_cash,
+//         tienda,
+//         guest_name,
+//         guest_email,
+//         phone,
+//         payment_format,
+//         payment_option,
+//         status_sell
+//       ]
+//     );
+
+//      await sendOrderEmail(order);
+
+//     return res.status(201).json({
+//       success: true,
+//       order: result.rows[0]
+//     });
+
+//   } catch (error) {
+
+//     console.log(error);
+
+//     return res.status(500).json({
+//       success: false,
+//       error: error.message
+//     });
+//   }
+// };
+
+
 export const createOrder = async (req, res) => {
   try {
-
     const {
       id,
       qrcode,
@@ -28,10 +120,8 @@ export const createOrder = async (req, res) => {
       phone,
       payment_format,
       payment_option,
-      status_sell
+      status_sell,
     } = req.body;
-
-    console.log(req.body)
 
     const result = await pool.query(
       `
@@ -77,22 +167,40 @@ export const createOrder = async (req, res) => {
         phone,
         payment_format,
         payment_option,
-        status_sell
+        status_sell,
       ]
     );
 
-    return res.status(201).json({
-      success: true,
-      order: result.rows[0]
+    // Send email
+    await sendOrderEmail({
+      id,
+      qrcode,
+      adm_in_charge,
+      gestor_sell,
+      orders,
+      dollar_price,
+      cup_price,
+      revenew_total,
+      seller_cash,
+      tienda,
+      guest_name,
+      guest_email,
+      phone,
+      payment_format,
+      payment_option,
+      status_sell,
     });
 
+    return res.status(201).json({
+      success: true,
+      order: result.rows[0],
+    });
   } catch (error) {
-
     console.log(error);
 
     return res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 };
