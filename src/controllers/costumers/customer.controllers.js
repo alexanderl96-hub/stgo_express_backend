@@ -586,3 +586,29 @@ export const deleteCustomer = async (req, res) => {
     });
   }
 };
+
+export const deleteCustomerGuest = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await pool.query(
+      `
+        DELETE FROM guest
+        WHERE guestid = $1
+        `,
+      [id],
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Customer deleted",
+    });
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Error deleting customer",
+    });
+  }
+};
