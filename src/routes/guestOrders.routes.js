@@ -5,7 +5,8 @@ import {
   getGuestOrders,
   getGuestOrder,
   updateGuestOrder,
-  deleteGuestOrder
+  deleteGuestOrder,
+  deleteMany
 } from "../controllers/guestOrders.controllers.js";
 
 const router = Router();
@@ -19,5 +20,7 @@ router.get("/:id", getGuestOrder);
 router.put("/:id", updateGuestOrder);
 
 router.delete("/:id", deleteGuestOrder);
+
+router.delete("/delete-many", deleteMany);
 
 export default router;

@@ -252,3 +252,40 @@ export const deleteGuestOrder = async (req, res) => {
     });
   }
 };
+
+export const deleteMany = async (req, res) => {
+  const { ids } = req.body;
+
+  try {
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide an array of IDs."
+      });
+    }
+
+    const result = await pool.query(
+      `
+      DELETE FROM guest_orders
+      WHERE id = ANY($1::bigint[])
+      RETURNING *;
+      `,
+      [ids]
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: `${result.rowCount} record(s) deleted successfully.`,
+      deleted: result.rows
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Error deleting records.",
+      error: error.message
+    });
+  }
+};
