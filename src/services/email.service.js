@@ -1,3 +1,4 @@
+import pool from "../config/db.js";
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
@@ -8,140 +9,142 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// export const sendOrderEmail = async (order) => {
-//   const products = order.orders
-//     .map(
-//       (item) => `
-//       <tr>
-//         <td>${item.name}</td>
-//         <td>${item.qty}</td>
-//         <td>${item.colors || "-"}</td>
-//         <td>${item.sizes || "-"}</td>
-//         <td>$${item.price}</td>
-//       </tr>
-//     `
-//     )
-//     .join("");
-
-//   await transporter.sendMail({
-//     from: process.env.EMAIL,
-
-//     // All recipients
-//     to: process.env.NOTIFICATION_EMAILS,
-
-//     subject: `🛒 Nuevo Pedido #${order.id}`,
-
-//     html: `
-//       <h2>Nuevo Pedido</h2>
-
-//       <p><b>Cliente:</b> ${order.guest_name}</p>
-//       <p><b>Correo:</b> ${order.guest_email}</p>
-//       <p><b>Teléfono:</b> ${order.phone}</p>
-
-//       <hr>
-
-//       <p><b>Administrador:</b> ${order.adm_in_charge}</p>
-//       <p><b>Forma de Pago:</b> ${order.payment_format}</p>
-//       <p><b>Método:</b> ${order.payment_option}</p>
-
-//       <table border="1" cellspacing="0" cellpadding="6">
-//         <thead>
-//           <tr>
-//             <th>Producto</th>
-//             <th>Cant.</th>
-//             <th>Color</th>
-//             <th>Talla</th>
-//             <th>Precio</th>
-//           </tr>
-//         </thead>
-
-//         <tbody>
-//           ${products}
-//         </tbody>
-//       </table>
-
-//       <hr>
-
-//       <p><b>Total:</b> $${order.revenew_total}</p>
-//       <p><b>Pago Vendedor:</b> $${order.seller_cash}</p>
-//       <p><b>Ganancia Tienda:</b> $${order.tienda}</p>
-
-//       <p>
-//         <a href="${order.qrcode}">
-//           Ver Pedido
-//         </a>
-//       </p>
-//     `,
-//   });
-// };
-
 export const sendOrderEmail = async (order) => {
-  const products = order.orders
-    .map(
-      (item) => `
-      <tr>
-        <td>${item.name}</td>
-        <td>${item.qty}</td>
-        <td>${item.colors || "-"}</td>
-        <td>${item.sizes || "-"}</td>
-        <td>$${item.price}</td>
-      </tr>
-    `
-    )
-    .join("");
+  try {
 
-  const info = await transporter.sendMail({
-    from: process.env.EMAIL,
+    // ============================================
+    // Find customer or guest by order id
+    // ============================================
 
-    to: process.env.NOTIFICATION_EMAILS,
+    let customer = null;
 
-    subject: `🛒 Nuevo Pedido #${order.id}`,
 
-    html: `
-      <h2>Nuevo Pedido</h2>
+    let result = await pool.query(
+            `
+            SELECT
+                name,
+                email,
+                o->>'id' AS order_id
+            FROM customers
+            CROSS JOIN LATERAL jsonb_array_elements("order") AS o
+            WHERE (o->>'id')::bigint = $1;
+            `,
+            [order.id]
+            );
 
-      <p><b>Cliente:</b> ${order.guest_name}</p>
-      <p><b>Correo:</b> ${order.guest_email}</p>
-      <p><b>Teléfono:</b> ${order.phone}</p>
 
-      <hr>
+    if (result.rows.length) {
+      customer = result.rows[0];
+    } else {
+      result = await pool.query(
+        `
+        SELECT name, email
+        FROM guest
+        WHERE EXISTS (
+          SELECT 1
+          FROM jsonb_array_elements("order") o
+          WHERE (o->>'id')::bigint = $1
+        )
+        `,
+        [order.id]
+      );
 
-      <p><b>Administrador:</b> ${order.adm_in_charge}</p>
+      if (result.rows.length) {
+        customer = result.rows[0];
+      }
+    }
 
-      <p><b>Forma de Pago:</b> ${order.payment_format}</p>
-      <p><b>Método:</b> ${order.payment_option}</p>
+    if (!customer) {
+      console.warn(`⚠️ Customer not found for order ${order.id}`);
 
-      <table border="1" cellspacing="0" cellpadding="6">
-        <thead>
+      customer = {
+        name: "Cliente no encontrado",
+        email: "-"
+      };
+    }
+
+    // ============================================
+    // Products
+    // ============================================
+
+    const products = order.orders
+      .map(
+        (item) => `
           <tr>
-            <th>Producto</th>
-            <th>Cant.</th>
-            <th>Color</th>
-            <th>Talla</th>
-            <th>Precio</th>
+            <td>${item.name}</td>
+            <td>${item.qty}</td>
+            <td>${item.colors || "-"}</td>
+            <td>${item.sizes || "-"}</td>
+            <td>$${item.price}</td>
           </tr>
-        </thead>
+        `
+      )
+      .join("");
 
-        <tbody>
-          ${products}
-        </tbody>
-      </table>
+    // ============================================
+    // Send Email
+    // ============================================
 
-      <hr>
+    const info = await transporter.sendMail({
+      from: process.env.EMAIL,
 
-      <p><b>Total:</b> $${order.revenew_total}</p>
-      <p><b>Pago Vendedor:</b> $${order.seller_cash}</p>
-      <p><b>Ganancia Tienda:</b> $${order.tienda}</p>
+      to: process.env.NOTIFICATION_EMAILS,
 
-      <p>
-        <a href="${order.qrcode}">
-          Ver Pedido
-        </a>
-      </p>
-    `,
-  });
+      subject: `🛒 Nuevo Pedido #${order.id}`,
 
-  console.log("✅ Email sent:", info.messageId);
+      html: `
+        <h2>🛒 Nuevo Pedido</h2>
 
-  return info;
+        <p><b>Cliente:</b> ${customer.name}</p>
+        <p><b>Correo:</b> ${customer.email}</p>
+        <p><b>Teléfono:</b> ${order.phone}</p>
+
+        <hr>
+
+        <p><b>Administrador:</b> ${order.adm_in_charge}</p>
+
+        <p><b>Forma de Pago:</b> ${order.payment_format}</p>
+
+        <p><b>Método:</b> ${order.payment_option}</p>
+
+        <table border="1" cellspacing="0" cellpadding="6" style="border-collapse:collapse;">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Cantidad</th>
+              <th>Color</th>
+              <th>Talla</th>
+              <th>Precio</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            ${products}
+          </tbody>
+        </table>
+
+        <hr>
+
+        <p><b>Total:</b> $${order.revenew_total}</p>
+
+        <p><b>Pago al Vendedor:</b> $${order.seller_cash}</p>
+
+        <p><b>Ganancia Tienda:</b> $${order.tienda}</p>
+
+        <p>
+          <a href="${order.qrcode}">
+            Ver Pedido
+          </a>
+        </p>
+      `,
+    });
+
+    console.log("✅ Email sent:", info.messageId);
+
+    return info;
+  } catch (err) {
+    console.error("❌ EMAIL ERROR:");
+    console.error(err);
+    throw err;
+  }
 };

@@ -1,4 +1,6 @@
 import pool from "../config/db.js";
+import { sendOrderEmail } from "../services/email.service.js";
+
 
 export const createGuestOrder = async (req, res) => {
   try {
@@ -69,6 +71,27 @@ export const createGuestOrder = async (req, res) => {
         status_sell
       ]
     );
+
+     console.log("check order", result)
+        // Send email
+        await sendOrderEmail({
+          id,
+          qrcode,
+          adm_in_charge,
+          gestor_sell,
+          orders,
+          dollar_price,
+          cup_price,
+          revenew_total,
+          seller_cash,
+          tienda,
+          guest_name,
+          guest_email,
+          phone,
+          payment_format,
+          payment_option,
+          status_sell,
+        });
 
     return res.status(201).json({
       success: true,

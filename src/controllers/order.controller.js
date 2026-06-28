@@ -11,96 +11,6 @@ import { sendOrderEmail } from "../services/email.service.js";
 /* =========================================
    CREATE ORDER
 ========================================= */
-// export const createOrder = async (req, res) => {
-//   try {
-
-//     const {
-//       id,
-//       qrcode,
-//       adm_in_charge,
-//       gestor_sell,
-//       orders,
-//       dollar_price,
-//       cup_price,
-//       revenew_total,
-//       seller_cash,
-//       tienda,
-//       guest_name,
-//       guest_email,
-//       phone,
-//       payment_format,
-//       payment_option,
-//       status_sell
-//     } = req.body;
-
-//     console.log(req.body)
-
-//     const result = await pool.query(
-//       `
-//       INSERT INTO guest_orders (
-//         id,
-//         qrcode,
-//         adm_in_charge,
-//         gestor_sell,
-//         orders,
-//         dollar_price,
-//         cup_price,
-//         revenew_total,
-//         seller_cash,
-//         tienda,
-//         guest_name,
-//         guest_email,
-//         phone,
-//         payment_format,
-//         payment_option,
-//         status_sell
-//       )
-//       VALUES (
-//         $1,$2,$3,$4,
-//         $5,$6,$7,$8,
-//         $9,$10,$11,$12,
-//         $13,$14,$15,$16
-//       )
-//       RETURNING *
-//       `,
-//       [
-//         id,
-//         qrcode,
-//         adm_in_charge,
-//         gestor_sell,
-//         JSON.stringify(orders),
-//         dollar_price,
-//         cup_price,
-//         revenew_total,
-//         seller_cash,
-//         tienda,
-//         guest_name,
-//         guest_email,
-//         phone,
-//         payment_format,
-//         payment_option,
-//         status_sell
-//       ]
-//     );
-
-//      await sendOrderEmail(order);
-
-//     return res.status(201).json({
-//       success: true,
-//       order: result.rows[0]
-//     });
-
-//   } catch (error) {
-
-//     console.log(error);
-
-//     return res.status(500).json({
-//       success: false,
-//       error: error.message
-//     });
-//   }
-// };
-
 
 export const createOrder = async (req, res) => {
   try {
@@ -171,25 +81,30 @@ export const createOrder = async (req, res) => {
       ]
     );
 
+  
+
+    console.log("check order complete", result)
+    await new Promise(resolve => setTimeout(resolve, 5000));
     // Send email
-    await sendOrderEmail({
-      id,
-      qrcode,
-      adm_in_charge,
-      gestor_sell,
-      orders,
-      dollar_price,
-      cup_price,
-      revenew_total,
-      seller_cash,
-      tienda,
-      guest_name,
-      guest_email,
-      phone,
-      payment_format,
-      payment_option,
-      status_sell,
-    });
+     // Send email
+        await sendOrderEmail({
+          id,
+          qrcode,
+          adm_in_charge,
+          gestor_sell,
+          orders,
+          dollar_price,
+          cup_price,
+          revenew_total,
+          seller_cash,
+          tienda,
+          guest_name,
+          guest_email,
+          phone,
+          payment_format,
+          payment_option,
+          status_sell,
+        });
 
     return res.status(201).json({
       success: true,
@@ -317,85 +232,6 @@ export const getOrderById = async (req, res) => {
 /* =========================================
    UPDATE ORDER
 ========================================= */
-
-// export const updateOrder = async (req, res) => {
-
-//     try {
-
-//       const { id } = req.params;
-
-//       const updatedData =
-//         req.body;
-
-//       const result =
-//         await pool.query(
-//           `
-//           UPDATE orders
-
-//           SET
-
-//             payment_format =
-//               $1,
-
-//             payment_option =
-//               $2,
-
-//             status_sell =
-//               $3,
-            
-//             adm_in_charge  =
-//               $4,
-            
-//             gestor_sell  =
-//               $5
-
-
-//           WHERE id = $6
-
-//           RETURNING *
-//           `,
-//           [
-
-
-//             updatedData.orders[0].payment_format,
-
-//             updatedData.orders[0].payment_option,
-
-//             updatedData.orders[0].status_sell,
-
-//             updatedData.orders[0].adm_in_charge,
-
-//             updatedData.orders[0].gestor_sell,
-
-//             id
-//           ]
-//         );
-
-
-
-//       return res.status(200).json({
-
-//         success: true,
-
-//         message:
-//           "Order updated successfully",
-
-//         order: result.rows[0]
-//       });
-
-//     } catch (error) {
-
-//       console.log(error);
-
-//       return res.status(500).json({
-
-//         success: false,
-
-//         message:
-//           "Error updating order"
-//       });
-//     }
-//   };
 
 export const updateOrder = async (req, res) => {
 
@@ -537,184 +373,6 @@ export const updateOrder = async (req, res) => {
   }
 };
 
-
-// export const deleteInOrderAndUser = async (req, res) => {
-//   const { customerId, orderId } = req.params;
-
-//   try {
-
-//     let tableName = "customers";
-
-//     let result = await pool.query(
-//       `
-//       SELECT "order"
-//       FROM customers
-//       WHERE customer_id = $1
-//       `,
-//       [customerId]
-//     );
-
-//     // If not found in customers, try guest
-//     if (!result.rows.length) {
-
-//       tableName = "guest";
-
-//       result = await pool.query(
-//         `
-//         SELECT "order"
-//         FROM guest
-//         WHERE guestid = $1
-//         `,
-//         [customerId]
-//       );
-//     }
-
-//     if (!result.rows.length) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "Customer/Guest not found"
-//       });
-//     }
-
-//     const ordersArray =
-//       result.rows[0].order || [];
-
-//     const orderProccessArray =
-//       result.rows[0].orderProccess || [];
-
-//     const orderDeliveredArray =
-//       result.rows[0].delivered || [];
-
-//     const updatedOrders =
-//       ordersArray.filter(
-//         order =>
-//           Number(order.id) !== Number(orderId)
-//       );
-
-//     const updatedOrderProccess =
-//       orderProccessArray.filter(
-//         order =>
-//           Number(order.id) !== Number(orderId)
-//       );
-
-//     // Update correct table
-//     if (tableName === "customers") {
-
-//       await pool.query(
-//         `
-//         UPDATE customers
-//         SET
-//           "order" = $1,
-//           "orderProccess" = $2
-//         WHERE customer_id = $3
-//         `,
-//         [
-//           JSON.stringify(updatedOrders),
-//           JSON.stringify(updatedOrderProccess),
-//           customerId
-//         ]
-//       );
-
-//     } else {
-//         await pool.query(
-//           `
-//           UPDATE guest
-//           SET
-//             "order" = $1,
-//             "orderProccess" = $2
-//           WHERE guestid = $3
-//           `,
-//           [
-//             JSON.stringify(updatedOrders),
-//             JSON.stringify(updatedOrderProccess),
-//             customerId
-//           ]
-//         );
-
-//     }
-
-
-//     const checkUpdatedOrders =
-//         ordersArray.filter(
-//           order =>
-//             Number(order.id) !== Number(orderId)
-//         );
-
-//       const checkUpdatedOrderProccess =
-//         orderProccessArray.filter(
-//           order =>
-//             Number(order.id) !== Number(orderId)
-//         );
-
-//       const checkUpdatedDelivered =
-//         orderDeliveredArray.filter(
-//           order =>
-//             Number(order.id) !== Number(orderId)
-//         );
-
-
-//     await pool.query(
-//         `
-//         UPDATE guest
-//         SET
-//           "order" = $1,
-//           "orderProccess" = $2,
-//           delivered = $3
-//         WHERE guestid = $4
-//         `,
-//         [
-//           JSON.stringify(checkUpdatedOrders),
-//           JSON.stringify(checkUpdatedOrderProccess),
-//           JSON.stringify(checkUpdatedDelivered),
-//           customerId
-//         ]
-//       );
-
-//     const shouldDeleteGuest =
-//         checkUpdatedOrders.length === 0 &&
-//         checkUpdatedOrderProccess.length === 0 &&
-//         checkUpdatedDelivered.length === 0;
-
-
-//     // Delete from orders table
-//     await pool.query(
-//       `
-//       DELETE FROM guest_orders
-//       WHERE id = $1
-//       `,
-//       [orderId]
-//     );
-
-//      // Delete from guest id table
-//      if (shouldDeleteGuest) {
-
-//         await pool.query(
-//           `
-//           DELETE FROM guest
-//           WHERE guestid = $1
-//           `,
-//           [customerId]
-//         );
-
-//       }
-
-//     return res.status(200).json({
-//       success: true,
-//       table: tableName,
-//       message: "Order removed successfully Completed"
-//     });
-
-//   } catch (error) {
-
-//     console.error(error);
-
-//     return res.status(500).json({
-//       success: false,
-//       message: error.message
-//     });
-
-//   }
-// };
 
     export const deleteInOrderAndUser = async (req, res) => {
       const { customerId, orderId } = req.params;
