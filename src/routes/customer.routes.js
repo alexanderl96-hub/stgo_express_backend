@@ -43,6 +43,6 @@ router.put("/:id", updateCustomer);
 router.put("/:id/orders", addCustomerOrder);
 
 router.delete("/:id", deleteCustomer);
-router.delete("/:id", deleteCustomerGuest);
+router.delete("/guest/:id", deleteCustomerGuest);
 
 export default router;
