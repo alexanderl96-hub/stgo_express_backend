@@ -8,7 +8,8 @@ import {
   deleteCustomer,
   createCustomerGuest,
   getCustomersGuest,
-  updateOrderStatus
+  updateOrderStatus,
+  deleteCustomerGuest
 } from "../controllers/costumers/customer.controllers.js";
 import {  login } from "../controllers/costumers/auth.controller.js";
 import { protect } from "../middleware/auth.middleware.js";
@@ -42,5 +43,6 @@ router.put("/:id", updateCustomer);
 router.put("/:id/orders", addCustomerOrder);
 
 router.delete("/:id", deleteCustomer);
+router.delete("/:id", deleteCustomerGuest);
 
 export default router;
