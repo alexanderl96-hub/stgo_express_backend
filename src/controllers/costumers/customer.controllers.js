@@ -410,12 +410,168 @@ export const addCustomerOrder = async (req, res) => {
 
 
 
+// export const updateOrderStatus = async (req, res) => {
+//   const { customerId, orderId } = req.params;
+//   const { status_sell } = req.body;
+
+//   try {
+//     const result = await pool.query(
+//       `
+//       SELECT "order", "orderProccess", delivered
+//       FROM customers
+//       WHERE customer_id = $1
+//       `,
+//       [customerId]
+//     );
+
+//     if (!result.rows.length) {
+//       return res.status(404).json({
+//         message: "Customer not found"
+//       });
+//     }
+
+//     let orders = result.rows[0].order || [];
+//     let orderProccess = result.rows[0].orderProccess || [];
+//     let delivered = result.rows[0].delivered || [];
+
+//     const orderFound = orders.find(
+//       o => Number(o.id) === Number(orderId)
+//     );
+
+//     if (!orderFound) {
+//       return res.status(404).json({
+//         message: "Order not found"
+//       });
+//     }
+
+//     const updatedOrder = {
+//       ...orderFound,
+//       status_sell
+//     };
+
+//     // ============================
+//     // UPDATE ORDER ARRAY
+//     // ============================
+
+//     orders = orders.map(o =>
+//       Number(o.id) === Number(orderId)
+//         ? updatedOrder
+//         : o
+//     );
+
+//     // ============================
+//     // LISTA
+//     // ============================
+
+//     if (status_sell === "Lista") {
+
+//       const processExists = orderProccess.some(
+//         o => Number(o.id) === Number(orderId)
+//       );
+
+//       if (processExists) {
+//         orderProccess = orderProccess.map(o =>
+//           Number(o.id) === Number(orderId)
+//             ? updatedOrder
+//             : o
+//         );
+//       } else {
+//         orderProccess.push(updatedOrder);
+//       }
+//     }
+
+//     // ============================
+//     // PAGADA
+//     // ============================
+
+//     if (status_sell === "Pagada") {
+
+//       // Update/Add in orderProccess
+
+//       const processExists = orderProccess.some(
+//         o => Number(o.id) === Number(orderId)
+//       );
+
+//       if (processExists) {
+//         orderProccess = orderProccess.map(o =>
+//           Number(o.id) === Number(orderId)
+//             ? updatedOrder
+//             : o
+//         );
+//       } else {
+//         orderProccess.push(updatedOrder);
+//       }
+
+//       // Update/Add in delivered
+
+//       const deliveredExists = delivered.some(
+//         o => Number(o.id) === Number(orderId)
+//       );
+
+//       if (deliveredExists) {
+//         delivered = delivered.map(o =>
+//           Number(o.id) === Number(orderId)
+//             ? {
+//                 ...updatedOrder,
+//                 delivered_date:
+//                   o.delivered_date ||
+//                   new Date().toISOString()
+//               }
+//             : o
+//         );
+//       } else {
+//         delivered.push({
+//           ...updatedOrder,
+//           delivered_date: new Date().toISOString()
+//         });
+//       }
+//     }
+
+//     await pool.query(
+//       `
+//       UPDATE customers
+//       SET
+//         "order" = $1,
+//         "orderProccess" = $2,
+//         delivered = $3
+//       WHERE customer_id = $4
+//       `,
+//       [
+//         JSON.stringify(orders),
+//         JSON.stringify(orderProccess),
+//         JSON.stringify(delivered),
+//         customerId
+//       ]
+//     );
+
+//     return res.status(200).json({
+//       success: true,
+//       message: `Order updated to ${status_sell}`,
+//       order: updatedOrder
+//     });
+
+//   } catch (error) {
+//     console.error(error);
+
+//     return res.status(500).json({
+//       success: false,
+//       message: error.message
+//     });
+//   }
+// };
+
 export const updateOrderStatus = async (req, res) => {
   const { customerId, orderId } = req.params;
   const { status_sell } = req.body;
 
   try {
-    const result = await pool.query(
+    let tableName = "customers";
+    let idColumn = "customer_id";
+
+    // -----------------------------
+    // Search customer first
+    // -----------------------------
+    let result = await pool.query(
       `
       SELECT "order", "orderProccess", delivered
       FROM customers
@@ -424,9 +580,27 @@ export const updateOrderStatus = async (req, res) => {
       [customerId]
     );
 
+    // -----------------------------
+    // If not found, search guest
+    // -----------------------------
+    if (!result.rows.length) {
+      tableName = "guest";
+      idColumn = "guestid";
+
+      result = await pool.query(
+        `
+        SELECT "order", "orderProccess", delivered
+        FROM guest
+        WHERE guestid = $1
+        `,
+        [customerId]
+      );
+    }
+
     if (!result.rows.length) {
       return res.status(404).json({
-        message: "Customer not found"
+        success: false,
+        message: "Customer/Guest not found"
       });
     }
 
@@ -435,42 +609,42 @@ export const updateOrderStatus = async (req, res) => {
     let delivered = result.rows[0].delivered || [];
 
     const orderFound = orders.find(
-      o => Number(o.id) === Number(orderId)
+      (o) => Number(o.id) === Number(orderId)
     );
 
     if (!orderFound) {
       return res.status(404).json({
+        success: false,
         message: "Order not found"
       });
     }
 
     const updatedOrder = {
       ...orderFound,
-      status_sell
+      status_sell,
     };
 
-    // ============================
-    // UPDATE ORDER ARRAY
-    // ============================
+    // --------------------------------
+    // Update order array
+    // --------------------------------
 
-    orders = orders.map(o =>
+    orders = orders.map((o) =>
       Number(o.id) === Number(orderId)
         ? updatedOrder
         : o
     );
 
-    // ============================
+    // --------------------------------
     // LISTA
-    // ============================
+    // --------------------------------
 
     if (status_sell === "Lista") {
-
       const processExists = orderProccess.some(
-        o => Number(o.id) === Number(orderId)
+        (o) => Number(o.id) === Number(orderId)
       );
 
       if (processExists) {
-        orderProccess = orderProccess.map(o =>
+        orderProccess = orderProccess.map((o) =>
           Number(o.id) === Number(orderId)
             ? updatedOrder
             : o
@@ -480,20 +654,17 @@ export const updateOrderStatus = async (req, res) => {
       }
     }
 
-    // ============================
+    // --------------------------------
     // PAGADA
-    // ============================
+    // --------------------------------
 
     if (status_sell === "Pagada") {
-
-      // Update/Add in orderProccess
-
       const processExists = orderProccess.some(
-        o => Number(o.id) === Number(orderId)
+        (o) => Number(o.id) === Number(orderId)
       );
 
       if (processExists) {
-        orderProccess = orderProccess.map(o =>
+        orderProccess = orderProccess.map((o) =>
           Number(o.id) === Number(orderId)
             ? updatedOrder
             : o
@@ -502,52 +673,54 @@ export const updateOrderStatus = async (req, res) => {
         orderProccess.push(updatedOrder);
       }
 
-      // Update/Add in delivered
-
       const deliveredExists = delivered.some(
-        o => Number(o.id) === Number(orderId)
+        (o) => Number(o.id) === Number(orderId)
       );
 
       if (deliveredExists) {
-        delivered = delivered.map(o =>
+        delivered = delivered.map((o) =>
           Number(o.id) === Number(orderId)
             ? {
                 ...updatedOrder,
                 delivered_date:
                   o.delivered_date ||
-                  new Date().toISOString()
+                  new Date().toISOString(),
               }
             : o
         );
       } else {
         delivered.push({
           ...updatedOrder,
-          delivered_date: new Date().toISOString()
+          delivered_date: new Date().toISOString(),
         });
       }
     }
 
+    // --------------------------------
+    // Update correct table
+    // --------------------------------
+
     await pool.query(
       `
-      UPDATE customers
+      UPDATE ${tableName}
       SET
         "order" = $1,
         "orderProccess" = $2,
         delivered = $3
-      WHERE customer_id = $4
+      WHERE ${idColumn} = $4
       `,
       [
         JSON.stringify(orders),
         JSON.stringify(orderProccess),
         JSON.stringify(delivered),
-        customerId
+        customerId,
       ]
     );
 
     return res.status(200).json({
       success: true,
       message: `Order updated to ${status_sell}`,
-      order: updatedOrder
+      order: updatedOrder,
     });
 
   } catch (error) {
@@ -555,7 +728,7 @@ export const updateOrderStatus = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };
