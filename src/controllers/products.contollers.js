@@ -559,6 +559,7 @@ export const getProductById = async (req, res) => {
             ? data.colors
             : JSON.stringify(data.colors);
       }
+      
 
     if (data.colors_match) {
       data.colors_match =
